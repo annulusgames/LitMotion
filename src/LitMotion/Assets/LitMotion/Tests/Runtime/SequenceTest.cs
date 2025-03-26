@@ -193,5 +193,41 @@ namespace LitMotion.Tests.Runtime
                 handle.Time = 0;
             }, "Cannot access the motion in sequence.");
         }
+
+        [UnityTest]
+        public IEnumerator Test_SequenceWithEase()
+        {
+            var x1 = 0f;
+            var x2 = 0f;
+            Ease ease = Ease.InExpo;
+
+            var motionHandle = LSequence.Create()
+                .Append(LMotion.Create(0f, 1f, 5f).Bind(v => x1 = v))
+                .Append(LMotion.Create(0f, 1f, 5f).Bind(v => x2 = v))
+                .WithEase(ease)
+                .Run();
+
+            motionHandle.Preserve();
+
+            for (int i = 1; i <= 10; i++)
+            {
+                yield return new WaitForSeconds(1f);
+                float sequenceProgress = (float)motionHandle.Time / 10f;
+                float sequenceEasedTime = EaseUtility.Evaluate(sequenceProgress, ease);
+                Assert.AreEqual(GetX1Time(sequenceEasedTime), x1, 0.01f, $"iteration: {i}");
+                Assert.AreEqual(GetX2Time(sequenceEasedTime), x2, 0.01f, $"iteration: {i}");
+            }
+            yield break;
+
+            float GetX1Time(float time)
+            {
+                return Mathf.Clamp01(time / 0.5f);
+            }
+
+            float GetX2Time(float time)
+            {
+                return Mathf.Clamp01((time - 0.5f) / 0.5f);
+            }
+        }
     }
 }
