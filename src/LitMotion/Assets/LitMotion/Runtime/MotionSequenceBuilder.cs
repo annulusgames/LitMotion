@@ -39,6 +39,7 @@ namespace LitMotion
         MotionSequenceBuilderSource next;
         ushort version;
         MotionSequenceItem[] buffer;
+        Ease ease;
         int count;
         double tail;
         double lastTail;
@@ -70,10 +71,16 @@ namespace LitMotion
             Insert(lastTail, handle);
         }
 
+        public void WithEase(Ease ease)
+        {
+            this.ease = ease;
+        }
+
         public MotionHandle Schedule(Action<MotionBuilder<double, NoOptions, DoubleMotionAdapter>> configuration)
         {
             var source = MotionSequenceSource.Rent();
             var builder = LMotion.Create(0.0, duration, (float)duration)
+                .WithEase(ease)
                 .WithOnComplete(source.OnCompleteDelegate)
                 .WithOnCancel(source.OnCancelDelegate);
 
@@ -145,6 +152,14 @@ namespace LitMotion
         {
             CheckIsDisposed();
             source.Join(handle);
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly MotionSequenceBuilder WithEase(Ease ease)
+        {
+            CheckIsDisposed();
+            source.WithEase(ease);
             return this;
         }
 
