@@ -194,9 +194,13 @@ namespace LitMotion.Animation.Editor
                 }
             };
             var playButton = new Button(() => {
-				((LitMotionAnimation)target).Play();
-				PrefabStage.prefabStageClosing += OnPrefabStageClosing;
-			})
+                ((LitMotionAnimation)target).Play();
+                if (PrefabStageUtility.GetCurrentPrefabStage() != null)
+                {
+                    PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+                    PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+                }
+            })
             {
                 text = "Play",
                 style = {
@@ -350,13 +354,13 @@ namespace LitMotion.Animation.Editor
             return !((LitMotionAnimation)target).IsActive;
         }
 
-		void OnPrefabStageClosing(PrefabStage stage)
-		{
-			PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
-			foreach (var  i in stage.prefabContentsRoot.GetComponentsInChildren<LitMotionAnimation>(true))
-			{
-				i.Stop();
-			}
-		}
+        void OnPrefabStageClosing(PrefabStage stage)
+        {
+            PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+            foreach (var  i in stage.prefabContentsRoot.GetComponentsInChildren<LitMotionAnimation>(true))
+            {
+                i.Stop();
+            }
+        }
     }
 }
