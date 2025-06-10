@@ -5,7 +5,7 @@ namespace LitMotion
     /// </summary>
     public enum Ease
     {
-        UnSet,
+        Unset,
         Linear,
         InSine,
         OutSine,
