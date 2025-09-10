@@ -14,13 +14,25 @@ namespace LitMotion.Animation
         [SerializeField] TObject target;
         [SerializeField] SerializableMotionSettings<TValue, TOptions> settings;
         [SerializeField] bool relative;
+        enum InterruptionValueState { StartValue, Stay, EndValue }
+        [SerializeField] InterruptionValueState interruptionValueState;
 
-        TValue startValue;
+        TValue startValue, endValue;
 
         public override void OnStop()
         {
             if (target == null) return;
-            SetValue(target, startValue);
+            switch (interruptionValueState)
+            {
+                case InterruptionValueState.StartValue:
+                    SetValue(target, startValue);
+                    break;
+                case InterruptionValueState.Stay:
+                    break;
+                case InterruptionValueState.EndValue:
+                    SetValue(target, endValue);
+                    break;
+            }
         }
 
         public override MotionHandle Play()
@@ -31,6 +43,7 @@ namespace LitMotion.Animation
 
             if (relative)
             {
+                endValue = GetRelativeValue(startValue, settings.EndValue);
                 handle = LMotion.Create<TValue, TOptions, TAdapter>(settings)
                     .Bind(this, (x, state) =>
                     {
@@ -39,6 +52,7 @@ namespace LitMotion.Animation
             }
             else
             {
+                endValue = settings.EndValue;
                 handle = LMotion.Create<TValue, TOptions, TAdapter>(settings)
                     .Bind(this, (x, state) =>
                     {
