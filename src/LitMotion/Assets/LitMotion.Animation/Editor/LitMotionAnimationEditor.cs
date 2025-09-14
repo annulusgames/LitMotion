@@ -103,22 +103,93 @@ namespace LitMotion.Animation.Editor
             var box = CreateBox("Components");
             var views = new List<AnimationComponentView>();
 
-            for (int i = 0; i < componentsProperty.arraySize; i++)
+            var properties = new List<SerializedProperty>();
+            for (int i = 0; i < componentsProperty.arraySize; ++i)
             {
-                var property = componentsProperty.GetArrayElementAtIndex(i);
-                var view = CreateComponentGUI(property.Copy());
-                CreateContextMenuManipulator(componentsProperty, i, false).target = view.Foldout.Q<Toggle>();
-
-                var enabledProperty = property.FindPropertyRelative("enabled");
-                if (enabledProperty != null)
-                {
-                    view.EnabledToggle.BindProperty(enabledProperty);
-                }
-
-                box.Add(view);
-                views.Add(view);
-                CreateContextMenuManipulator(componentsProperty, i, true).target = view.ContextMenuButton;
+                properties.Add(componentsProperty.GetArrayElementAtIndex(i));
             }
+
+            ListView listView = null;
+            VisualElement MakeItem()
+            {
+                var view = new AnimationComponentView();
+                var dynamicContainer = view.Q<VisualElement>("dynamic-container");
+                dynamicContainer.RegisterCallback<ChangeEvent<object>>(_ =>
+                {
+                    componentsProperty.serializedObject.ApplyModifiedProperties();
+                });
+                return view;
+            }
+            void BindItem(VisualElement element, int index)
+            {
+                var view = (AnimationComponentView)element;
+                var dynamicContainer = view.Q<VisualElement>("dynamic-container");
+                dynamicContainer.Clear();
+
+                var propertyOriginal = componentsProperty.GetArrayElementAtIndex(index);
+                var property = propertyOriginal.Copy();
+                if (string.IsNullOrEmpty(property.managedReferenceFullTypename))
+                {
+                    view.Text = "(Missing)";
+                    view.Icon = (Texture2D)EditorGUIUtility.IconContent("Error").image;
+                    view.EnabledToggle.value = true;
+                    view.SetEnabled(true);
+                    view.EnabledToggle.Q("unity-checkmark").style.visibility = Visibility.Hidden;
+                    view.Add(new HelpBox("The type referenced in SerializeReference is missing. You may have renamed the type or moved it to a different namespace or assembly.", HelpBoxMessageType.Error));
+                }
+                else
+                {
+                    view.Text = property.FindPropertyRelative("displayName").stringValue;
+
+                    var targetProperty = property.FindPropertyRelative("target");
+                    if (targetProperty != null)
+                    {
+                        view.Icon = GUIHelper.GetComponentIcon(targetProperty.GetPropertyType());
+                    }
+
+                    view.TrackPropertyValue(property.FindPropertyRelative("displayName"), x =>
+                    {
+                        view.Text = x.stringValue;
+                    });
+
+                    view.Foldout.BindProperty(property);
+                    view.FoldoutToggle.BindProperty(property.FindPropertyRelative("foldoutOn"));
+
+                    var endProperty = property.GetEndProperty();
+                    var isFirst = true;
+                    while (property.NextVisible(isFirst))
+                    {
+                        if (SerializedProperty.EqualContents(property, endProperty)) break;
+                        if (property.name == "enabled") continue;
+                        isFirst = false;
+
+                        var field = new PropertyField(property);
+                        field.BindProperty(property);
+                        dynamicContainer.Add(field);
+                    }
+                    var enabledProperty = propertyOriginal.FindPropertyRelative("enabled");
+                    if (enabledProperty != null)
+                        view.EnabledToggle.BindProperty(enabledProperty);
+                    CreateContextMenuManipulator(componentsProperty, index, false).target = view.Foldout.Q<Toggle>();
+                    CreateContextMenuManipulator(componentsProperty, index, true).target = view.ContextMenuButton;
+
+                }
+            }
+            listView = new ListView(properties, -1, MakeItem, BindItem)
+            {
+                reorderable = true,
+                selectionType = SelectionType.Single,
+                showBorder = true,
+                virtualizationMethod = CollectionVirtualizationMethod.DynamicHeight,
+                reorderMode = ListViewReorderMode.Animated,
+            };
+            listView.itemIndexChanged += (startIndex, endIndex) =>
+            {
+                componentsProperty.MoveArrayElement(startIndex, endIndex);
+                serializedObject.ApplyModifiedProperties();
+                listView.Rebuild();
+            };
+            box.Add(listView);
 
             var addButton = new Button()
             {
@@ -145,6 +216,24 @@ namespace LitMotion.Animation.Editor
             {
                 if (componentsProperty.arraySize != prevArraySize)
                 {
+                    if (prevArraySize < componentsProperty.arraySize)
+                    {
+                        var seen = new HashSet<object>();
+                        bool dirty = false;
+                        for (int i = 0; i < componentsProperty.arraySize; ++i)
+                        {
+                            var element = componentsProperty.GetArrayElementAtIndex(i);
+                            var value = element.managedReferenceValue;
+                            if (value != null && !seen.Add(value))
+                            {
+                                var cloned = JsonUtility.FromJson(JsonUtility.ToJson(value), value.GetType());
+                                element.managedReferenceValue = cloned;
+                                dirty = true;
+                            }
+                        }
+                        if (dirty)
+                            serializedObject.ApplyModifiedProperties();
+                    }
                     RefleshComponentsView(true);
                     prevArraySize = componentsProperty.arraySize;
                 }
@@ -249,51 +338,6 @@ namespace LitMotion.Animation.Editor
 
             componentRoot.Clear();
             componentRoot.Add(CreateComponentsPanel());
-        }
-
-        AnimationComponentView CreateComponentGUI(SerializedProperty property)
-        {
-            var view = new AnimationComponentView();
-
-            if (string.IsNullOrEmpty(property.managedReferenceFullTypename))
-            {
-                view.Text = "(Missing)";
-                view.Icon = (Texture2D)EditorGUIUtility.IconContent("Error").image;
-                view.EnabledToggle.value = true;
-                view.SetEnabled(true);
-                view.EnabledToggle.Q("unity-checkmark").style.visibility = Visibility.Hidden;
-                view.Add(new HelpBox("The type referenced in SerializeReference is missing. You may have renamed the type or moved it to a different namespace or assembly.", HelpBoxMessageType.Error));
-            }
-            else
-            {
-                view.Text = property.FindPropertyRelative("displayName").stringValue;
-
-                var targetProperty = property.FindPropertyRelative("target");
-                if (targetProperty != null)
-                {
-                    view.Icon = GUIHelper.GetComponentIcon(targetProperty.GetPropertyType());
-                }
-
-                view.TrackPropertyValue(property.FindPropertyRelative("displayName"), x =>
-                {
-                    view.Text = x.stringValue;
-                });
-
-                view.Foldout.BindProperty(property);
-
-                var endProperty = property.GetEndProperty();
-                var isFirst = true;
-                while (property.NextVisible(isFirst))
-                {
-                    if (SerializedProperty.EqualContents(property, endProperty)) break;
-                    if (property.name == "enabled") continue;
-                    isFirst = false;
-
-                    view.Add(new PropertyField(property));
-                }
-            }
-
-            return view;
         }
 
         ContextualMenuManipulator CreateContextMenuManipulator(SerializedProperty property, int arrayIndex, bool activeLeftClick)
