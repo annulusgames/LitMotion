@@ -354,6 +354,12 @@ namespace LitMotion.Animation.Editor
 
                 evt.menu.AppendSeparator();
 
+                evt.menu.AppendAction("Duplicate", x =>
+                {
+                    property.InsertArrayElementAtIndex(arrayIndex);
+                    RefleshComponentsView(true);
+                });
+
                 evt.menu.AppendAction("Remove Component", x =>
                 {
                     property.DeleteArrayElementAtIndex(arrayIndex);
