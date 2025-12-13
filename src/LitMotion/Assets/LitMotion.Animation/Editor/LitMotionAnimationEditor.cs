@@ -94,7 +94,7 @@ namespace LitMotion.Animation.Editor
         VisualElement CreateSettingsPanel()
         {
             var box = CreateBox("Settings");
-            box.Add(new PropertyField(serializedObject.FindProperty("playOnAwake")));
+            box.Add(new PropertyField(serializedObject.FindProperty("autoPlayMode")));
             box.Add(new PropertyField(serializedObject.FindProperty("animationMode")));
             return box;
         }

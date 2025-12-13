@@ -8,13 +8,20 @@ namespace LitMotion.Animation
     [AddComponentMenu("LitMotion Animation")]
     public sealed class LitMotionAnimation : MonoBehaviour
     {
+        enum AutoPlayMode
+        {
+            None,
+            OnStart,
+            OnEnable
+        }
+
         enum AnimationMode
         {
             Parallel,
             Sequential
         }
 
-        [SerializeField] bool playOnAwake = true;
+        [SerializeField] AutoPlayMode autoPlayMode = AutoPlayMode.OnStart;
         [SerializeField] AnimationMode animationMode;
 
         [SerializeReference]
@@ -25,9 +32,16 @@ namespace LitMotion.Animation
 
         public IReadOnlyList<LitMotionAnimationComponent> Components => components;
 
+        private void OnEnable()
+        {
+            if (autoPlayMode == AutoPlayMode.OnEnable)
+                Play();
+        }
+
         void Start()
         {
-            if (playOnAwake) Play();
+            if (autoPlayMode == AutoPlayMode.OnStart)
+                Play();
         }
 
         void MoveNextMotion()
@@ -184,6 +198,12 @@ namespace LitMotion.Animation
 
                 return false;
             }
+        }
+
+        private void OnDisable()
+        {
+            if (autoPlayMode == AutoPlayMode.OnEnable)
+                Stop();
         }
 
         void OnDestroy()
