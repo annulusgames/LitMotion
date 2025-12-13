@@ -45,6 +45,12 @@ namespace LitMotion.Animation.Editor
         void OnEnable()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+
+            if (PrefabStageUtility.GetCurrentPrefabStage() != null)
+            {
+                PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+                PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+            }
         }
 
         void OnDisable()
@@ -96,6 +102,8 @@ namespace LitMotion.Animation.Editor
             var box = CreateBox("Settings");
             box.Add(new PropertyField(serializedObject.FindProperty("autoPlayMode")));
             box.Add(new PropertyField(serializedObject.FindProperty("animationMode")));
+            box.Add(new PropertyField(serializedObject.FindProperty("isPlayForward")));
+            box.Add(new PropertyField(serializedObject.FindProperty("manualLoop")));
             return box;
         }
 
@@ -215,23 +223,23 @@ namespace LitMotion.Animation.Editor
                     flexGrow = 1f,
                 }
             };
-            var playButton = new Button(() => {
-                ((LitMotionAnimation)target).Play();
-                if (PrefabStageUtility.GetCurrentPrefabStage() != null)
-                {
-                    PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
-                    PrefabStage.prefabStageClosing += OnPrefabStageClosing;
-                }
-            })
+            var playButton = new Button(() => ((LitMotionAnimation)target).PlayForward())
             {
                 text = "Play",
                 style = {
                     flexGrow = 1f,
                 }
             };
-            var restartButton = new Button(() => ((LitMotionAnimation)target).Restart())
+            var playReverse = new Button(() => ((LitMotionAnimation)target).PlayBackward())
             {
-                text = "Restart",
+                text = "Reverse",
+                style = {
+                    flexGrow = 1f,
+                }
+            };
+            var restartButton = new Button(() => ((LitMotionAnimation)target).Resume())
+            {
+                text = "Resume",
                 style = {
                     flexGrow = 1f,
                 }
@@ -252,6 +260,7 @@ namespace LitMotion.Animation.Editor
             };
 
             buttonGroup.Add(playButton);
+            buttonGroup.Add(playReverse);
             buttonGroup.Add(restartButton);
             buttonGroup.Add(stopButton);
             buttonGroup.Add(resetButton);

@@ -26,6 +26,7 @@ namespace LitMotion.Animation
         public string DisplayName => displayName;
 
         public abstract MotionHandle Play();
+        public abstract MotionHandle PlayBackward();
 
         public virtual void OnResume() { }
         public virtual void OnPause() { }

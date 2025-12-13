@@ -23,6 +23,15 @@ namespace LitMotion.Animation.Components
                 });
         }
 
+        public override MotionHandle PlayBackward()
+        {
+            return LMotion.Create<TValue, TOptions, TAdapter>(settings, true)
+                .Bind(this, (x, state) =>
+                {
+                    state.onValueChanged.Invoke(x);
+                });
+        }
+
         public override void OnStop() { }
     }
 
@@ -73,6 +82,11 @@ namespace LitMotion.Animation.Components
                     // TODO: avoid allocation
                     state.onValueChanged.Invoke(x.ConvertToString());
                 });
+        }
+
+        public override MotionHandle PlayBackward()
+        {
+            return Play();
         }
 
         public override void OnStop() { }
