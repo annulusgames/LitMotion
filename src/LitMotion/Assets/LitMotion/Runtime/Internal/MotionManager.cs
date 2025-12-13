@@ -115,5 +115,14 @@ namespace LitMotion
                 throw new ArgumentException("Invalid type id.");
             }
         }
+
+#if UNITY_EDITOR
+        [UnityEditor.InitializeOnEnterPlayMode]
+        private static void Clear()
+        {
+            MotionTypeCount = 0;
+            list.Clear();
+        }
+#endif
     }
 }
