@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using LitMotion.Collections;
 using UnityEngine;
 
 namespace LitMotion.Animation
@@ -27,10 +26,12 @@ namespace LitMotion.Animation
         [SerializeReference]
         LitMotionAnimationComponent[] components;
 
-        Queue<LitMotionAnimationComponent> queue = new();
-        FastListCore<LitMotionAnimationComponent> playingComponents;
+        private List<LitMotionAnimationComponent> playingComponents = new();
 
         public IReadOnlyList<LitMotionAnimationComponent> Components => components;
+
+        private bool IsPlayForward = true;
+        private int playIndex = 0;
 
         private void OnEnable()
         {
@@ -44,46 +45,54 @@ namespace LitMotion.Animation
                 Play();
         }
 
-        void MoveNextMotion()
+        private void OnCompleteAction()
         {
-            if (queue.TryDequeue(out var queuedComponent))
+            playIndex += IsPlayForward ? 1 : -1;
+            //Debug.Log($"OnCompleteAction called. playIndex: {playIndex}");
+            switch (animationMode)
             {
-                try
-                {
-                    var handle = queuedComponent.Play();
-                    var isActive = handle.IsActive();
-
-                    if (isActive)
+                case AnimationMode.Sequential:
+                    try
                     {
-                        handle.Preserve();
-                        MotionManager.GetManagedDataRef(handle, false).OnCompleteAction += MoveNextMotion;
+                        if (playIndex < playingComponents.Count && playIndex >= 0)
+                        {
+                            var component = playingComponents[playIndex];
+                            var handle = component.Play();
+                            handle.PlaybackSpeed = IsPlayForward ? 1f : -1f;
+                            handle.Time = IsPlayForward ? 0 : GetPlayBackwardTime(handle);
+                            component.TrackedHandle = handle;
+
+                            if (handle.IsActive())
+                            {
+                                int loop = handle.Loops;
+                                if (loop <= 0)
+                                    loop = 1;
+                                var temp = LMotion.Create(0f, 1f, (float)handle.TotalDuration).WithOnComplete(OnCompleteAction).RunWithoutBinding();
+                                MotionManager.GetManagedDataRef(handle, false).OnCancelAction += () => temp.TryCancel();
+                                //MotionManager.GetManagedDataRef(handle, false).OnCompleteAction += OnCompleteAction;
+                                //handle.Preserve();
+                            }
+                        }
                     }
-
-                    queuedComponent.TrackedHandle = handle;
-                    playingComponents.Add(queuedComponent);
-
-                    if (!isActive)
+                    catch (Exception ex)
                     {
-                        MoveNextMotion();
+                        Debug.LogException(ex);
                     }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogException(ex);
-                }
+                    break;
             }
         }
 
         public void Play()
         {
+            playIndex = IsPlayForward ? -1 : components.Length;
             var isPlaying = false;
 
-            foreach (var component in playingComponents.AsSpan())
+            foreach (var component in playingComponents)
             {
                 var handle = component.TrackedHandle;
                 if (handle.IsActive())
                 {
-                    handle.PlaybackSpeed = 1f;
+                    handle.PlaybackSpeed = IsPlayForward ? 1f : -1f;
                     isPlaying = true;
 
                     component.OnResume();
@@ -101,41 +110,69 @@ namespace LitMotion.Animation
                     {
                         if (component == null) continue;
                         if (!component.Enabled) continue;
-                        queue.Enqueue(component);
+                        playingComponents.Add(component);
                     }
 
-                    MoveNextMotion();
+                    OnCompleteAction();
                     break;
-                case AnimationMode.Parallel:
-                    foreach (var component in components)
-                    {
-                        if (component == null) continue;
-                        if (!component.Enabled) continue;
 
-                        try
+                case AnimationMode.Parallel:
+                    try
+                    {
+                        foreach (var component in components)
                         {
+                            if (component == null) continue;
+                            if (!component.Enabled) continue;
+
                             var handle = component.Play();
+                            handle.PlaybackSpeed = IsPlayForward ? 1f : -1f;
+                            handle.Time = IsPlayForward ? 0 : GetPlayBackwardTime(handle);
                             component.TrackedHandle = handle;
 
-                            if (handle.IsActive())
-                            {
-                                handle.Preserve();
-                            }
+                            //if (handle.IsActive())
+                            //{
+                            //    handle.Preserve();
+                            //}
 
                             playingComponents.Add(component);
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.LogException(ex);
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException(ex);
                     }
                     break;
             }
+
+            //Debug.Log($"Play called. Playing components count: {playingComponents.Count}");
+        }
+
+        private float GetPlayBackwardTime(MotionHandle handle)
+        {
+            float playbackwardTime = handle.Duration * handle.Loops;
+            int loop = handle.Loops;
+            if (loop < 0)
+                loop = 1000000;
+            playbackwardTime = handle.Duration * loop - 0.001f;
+            //Debug.Log($"Setting backward time to {playbackwardTime}");
+            return playbackwardTime;
+        }
+
+        public void PlayForward()
+        {
+            IsPlayForward = true;
+            Restart();
+        }
+
+        public void PlayBackward()
+        {
+            IsPlayForward = false;
+            Restart();
         }
 
         public void Pause()
         {
-            foreach (var component in playingComponents.AsSpan())
+            foreach (var component in playingComponents)
             {
                 var handle = component.TrackedHandle;
                 if (handle.IsActive())
@@ -148,9 +185,7 @@ namespace LitMotion.Animation
 
         public void Stop()
         {
-            var span = playingComponents.AsSpan();
-            span.Reverse();
-            foreach (var component in span)
+            foreach (var component in playingComponents)
             {
                 var handle = component.TrackedHandle;
                 handle.TryCancel();
@@ -159,7 +194,6 @@ namespace LitMotion.Animation
             }
 
             playingComponents.Clear();
-            queue.Clear();
         }
 
         public void Restart()
@@ -172,9 +206,7 @@ namespace LitMotion.Animation
         {
             get
             {
-                if (queue.Count > 0) return true;
-
-                foreach (var component in playingComponents.AsSpan())
+                foreach (var component in playingComponents)
                 {
                     var handle = component.TrackedHandle;
                     if (handle.IsActive()) return true;
@@ -188,9 +220,7 @@ namespace LitMotion.Animation
         {
             get
             {
-                if (queue.Count > 0) return true;
-
-                foreach (var component in playingComponents.AsSpan())
+                foreach (var component in playingComponents)
                 {
                     var handle = component.TrackedHandle;
                     if (handle.IsPlaying()) return true;

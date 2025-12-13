@@ -45,6 +45,12 @@ namespace LitMotion.Animation.Editor
         void OnEnable()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+
+            if (PrefabStageUtility.GetCurrentPrefabStage() != null)
+            {
+                PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+                PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+            }
         }
 
         void OnDisable()
@@ -215,16 +221,16 @@ namespace LitMotion.Animation.Editor
                     flexGrow = 1f,
                 }
             };
-            var playButton = new Button(() => {
-                ((LitMotionAnimation)target).Play();
-                if (PrefabStageUtility.GetCurrentPrefabStage() != null)
-                {
-                    PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
-                    PrefabStage.prefabStageClosing += OnPrefabStageClosing;
-                }
-            })
+            var playButton = new Button(() => ((LitMotionAnimation)target).PlayForward())
             {
                 text = "Play",
+                style = {
+                    flexGrow = 1f,
+                }
+            };
+            var playReverse = new Button(() => ((LitMotionAnimation)target).PlayBackward())
+            {
+                text = "Reverse",
                 style = {
                     flexGrow = 1f,
                 }
@@ -252,6 +258,7 @@ namespace LitMotion.Animation.Editor
             };
 
             buttonGroup.Add(playButton);
+            buttonGroup.Add(playReverse);
             buttonGroup.Add(restartButton);
             buttonGroup.Add(stopButton);
             buttonGroup.Add(resetButton);
