@@ -217,6 +217,32 @@ namespace LitMotion.Animation
             Play();
         }
 
+        public float GetDuration()
+        {
+            float totalDuration = 0f;
+            switch(animationMode)
+            {
+                case AnimationMode.Sequential:
+                    foreach (var component in playingComponents)
+                    {
+                        var handle = component.TrackedHandle;
+                        totalDuration += (float)handle.TotalDuration;
+                    }
+                    break;
+
+                case AnimationMode.Parallel:
+                    foreach (var component in playingComponents)
+                    {
+                        var handle = component.TrackedHandle;
+                        var duration = (float)handle.TotalDuration;
+                        if (duration > totalDuration)
+                            totalDuration = duration;
+                    }
+                    break;
+            }
+            return totalDuration;
+        }
+
         public bool IsActive
         {
             get
