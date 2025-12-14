@@ -98,6 +98,11 @@ namespace LitMotion
                         {
                             managedData.InvokeOnComplete();
                         }
+
+                        if (state.WasStart)
+                        {
+                            managedData.InvokeOnStart();
+                        }
                     }
                 }
             }

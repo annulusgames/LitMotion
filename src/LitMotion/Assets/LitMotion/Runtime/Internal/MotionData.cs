@@ -22,6 +22,7 @@ namespace LitMotion
             public double Time;
             public float PlaybackSpeed;
 
+            public readonly bool WasStart => WasStatusChanged && Status == MotionStatus.Playing;
             public readonly bool WasStatusChanged => Status != PrevStatus;
             public readonly bool WasLoopCompleted => CompletedLoops > PrevCompletedLoops;
 
