@@ -126,6 +126,7 @@ namespace LitMotion
             managedDataRef.OnLoopCompleteAction = buffer.OnLoopCompleteAction;
             managedDataRef.OnCancelAction = buffer.OnCancelAction;
             managedDataRef.OnCompleteAction = buffer.OnCompleteAction;
+            managedDataRef.OnStartAction = buffer.OnStartAction;
             managedDataRef.StateCount = buffer.StateCount;
             managedDataRef.State0 = buffer.State0;
             managedDataRef.State1 = buffer.State1;

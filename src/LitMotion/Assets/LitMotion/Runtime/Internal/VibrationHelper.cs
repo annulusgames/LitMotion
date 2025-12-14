@@ -15,9 +15,9 @@ namespace LitMotion
                 result = 0f;
                 return;
             }
-            float angularFrequency = (frequency - 0.5f) * math.PI;
+            float angularFrequency = (frequency * t - 0.5f) * math.PI;
             float dampingFactor = dampingRatio * frequency / (2f * math.PI);
-            result = strength * math.pow(math.E, -dampingFactor * t) * math.cos(angularFrequency * t);
+            result = strength * math.pow(math.E, -dampingFactor * t) * math.cos(angularFrequency);
         }
 
         [BurstCompile]
@@ -28,9 +28,9 @@ namespace LitMotion
                 result = Vector2.zero;
                 return;
             }
-            float angularFrequency = (frequency - 0.5f) * math.PI;
+            float angularFrequency = (frequency * t - 0.5f) * math.PI;
             float dampingFactor = dampingRatio * frequency / (2f * math.PI);
-            result = math.cos(angularFrequency * t) * math.pow(math.E, -dampingFactor * t) * strength;
+            result = math.cos(angularFrequency) * math.pow(math.E, -dampingFactor * t) * strength;
         }
 
         [BurstCompile]
@@ -41,9 +41,9 @@ namespace LitMotion
                 result = Vector3.zero;
                 return;
             }
-            float angularFrequency = (frequency - 0.5f) * math.PI;
+            float angularFrequency = (frequency * t - 0.5f) * math.PI;
             float dampingFactor = dampingRatio * frequency / (2f * math.PI);
-            result = math.cos(angularFrequency * t) * math.pow(math.E, -dampingFactor * t) * strength;
+            result = math.cos(angularFrequency) * math.pow(math.E, -dampingFactor * t) * strength;
         }
     }
 }

@@ -25,6 +25,7 @@ namespace LitMotion
         public Action<int> OnLoopCompleteAction;
         public Action OnCompleteAction;
         public Action OnCancelAction;
+        public Action OnStartAction;
 
 #if LITMOTION_DEBUG
         public string DebugName;
@@ -82,6 +83,19 @@ namespace LitMotion
             try
             {
                 OnLoopCompleteAction?.Invoke(completedLoops);
+            }
+            catch (Exception ex)
+            {
+                MotionDispatcher.GetUnhandledExceptionHandler()?.Invoke(ex);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly void InvokeOnStart()
+        {
+            try
+            {
+                OnStartAction?.Invoke();
             }
             catch (Exception ex)
             {

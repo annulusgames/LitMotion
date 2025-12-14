@@ -56,6 +56,7 @@ namespace LitMotion
             buffer.OnLoopCompleteAction = default;
             buffer.OnCompleteAction = default;
             buffer.OnCancelAction = default;
+            buffer.OnStartAction = default;
 
             buffer.CancelOnError = default;
             buffer.SkipValuesDuringDelay = default;
@@ -97,6 +98,7 @@ namespace LitMotion
         public Action<int> OnLoopCompleteAction;
         public Action OnCompleteAction;
         public Action OnCancelAction;
+        public Action OnStartAction;
         public AnimationCurve AnimationCurve;
         public IMotionScheduler Scheduler;
 
@@ -234,6 +236,14 @@ namespace LitMotion
         {
             CheckBuffer();
             buffer.OnLoopCompleteAction += callback;
+            return this;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly MotionBuilder<TValue, TOptions, TAdapter> WithOnStart(Action callback)
+        {
+            CheckBuffer();
+            buffer.OnStartAction += callback;
             return this;
         }
 

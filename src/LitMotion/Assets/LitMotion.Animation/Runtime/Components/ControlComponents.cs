@@ -16,6 +16,11 @@ namespace LitMotion.Animation.Components
                 .RunWithoutBinding();
         }
 
+        public override MotionHandle PlayBackward()
+        {
+            return Play();
+        }
+
         public override void OnStop() { }
     }
 
@@ -31,6 +36,11 @@ namespace LitMotion.Animation.Components
         {
             onPlay.Invoke();
             return LMotion.Create(0f, 1f, 0f).RunWithoutBinding();
+        }
+
+        public override MotionHandle PlayBackward()
+        {
+            return Play();
         }
 
         public override void OnStop()
@@ -54,6 +64,11 @@ namespace LitMotion.Animation.Components
                     if (target == null) TrackedHandle.TryComplete();
                     if (!target.IsPlaying) TrackedHandle.TryComplete();
                 });
+        }
+
+        public override MotionHandle PlayBackward()
+        {
+            return Play();
         }
 
         public override void OnResume()
