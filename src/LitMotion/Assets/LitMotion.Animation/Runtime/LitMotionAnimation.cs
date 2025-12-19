@@ -66,9 +66,9 @@ namespace LitMotion.Animation
 
         private void OnNextSequence()
         {
-#if UNITY_EDITOR
-            Debug.Log($"OnCompleteAction called. playIndex: {playIndex} IsPlayForward {isPlayForward}");
-#endif
+//#if UNITY_EDITOR
+//            Debug.Log($"OnCompleteAction called. playIndex: {playIndex} IsPlayForward {isPlayForward}");
+//#endif
             switch (animationMode)
             {
                 case AnimationMode.Sequential:
@@ -145,9 +145,9 @@ namespace LitMotion.Animation
                     break;
             }
 
-#if UNITY_EDITOR
-            Debug.Log($"Play called. Playing components count: {playingComponents.Count}");
-#endif
+//#if UNITY_EDITOR
+//            Debug.Log($"Play called. Playing components count: {playingComponents.Count}");
+//#endif
         }
 
         public void PlayForward()
