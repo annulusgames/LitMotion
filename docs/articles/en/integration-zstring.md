@@ -2,7 +2,7 @@
 
 By integrating [ZString](https://github.com/Cysharp/ZString) into your project, you can achieve zero-allocation string formatting.
 
-If you install ZString via the Package Manager, the internal processing will automatically be replaced with ZString. If you use a unitypackage or similar method to install, you'll need to add `LITMOTION_ZSTRING_SUPPORT` to `Project Settings > Player > Scripting Define Symbols`.
+If you install ZString via the Package Manager, the internal processing will automatically be replaced with ZString. If you use a unitypackage or similar method to install, you'll need to add `LITMOTION_SUPPORT_ZSTRING` to `Project Settings > Player > Scripting Define Symbols`.
 
 ### Zero-Allocation for BindToText
 

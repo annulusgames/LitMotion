@@ -2,7 +2,7 @@
 
 プロジェクトに[ZString](https://github.com/Cysharp/ZString)を導入することで、文字列のフォーマット処理をゼロアロケーション化することができます。
 
-ZStringをPackage Managerから導入した場合は、自動で内部の処理がZStringを使用したものに置き換えられます。unitypackage等で導入した場合は、`Project Settings > Player > Scripting Define Symbols`に`LITMOTION_ZSTRING_SUPPORT`を追加する必要があります。
+ZStringをPackage Managerから導入した場合は、自動で内部の処理がZStringを使用したものに置き換えられます。unitypackage等で導入した場合は、`Project Settings > Player > Scripting Define Symbols`に`LITMOTION_SUPPORT_ZSTRING`を追加する必要があります。
 
 ### BindToTextのゼロアロケーション化
 
