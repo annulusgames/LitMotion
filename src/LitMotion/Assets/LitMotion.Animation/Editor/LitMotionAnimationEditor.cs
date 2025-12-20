@@ -95,6 +95,23 @@ namespace LitMotion.Animation.Editor
             var box = CreateBox("Settings");
             box.Add(new PropertyField(serializedObject.FindProperty("playOnAwake")));
             box.Add(new PropertyField(serializedObject.FindProperty("animationMode")));
+            box.Add(new PropertyField(serializedObject.FindProperty("solo")));
+            var row = new VisualElement();
+            row.style.flexDirection = FlexDirection.Row;
+            row.Add(new PropertyField(serializedObject.FindProperty("GroupId"), "Group ID, Source")
+            {
+                style = {
+                    flexGrow = 1,
+                    marginRight = 4
+                }
+            });
+            row.Add(new PropertyField(serializedObject.FindProperty("groupIdSource"))
+            {
+                style = {
+                    flexGrow = 1,
+                }
+            });
+            box.Add(row);
             return box;
         }
 
