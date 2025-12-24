@@ -49,6 +49,32 @@ namespace LitMotion.Animation
             return handle;
         }
 
+        public override MotionHandle PlayBackward()
+        {
+            startValue = GetValue(target);
+
+            MotionHandle handle;
+
+            if (relative)
+            {
+                handle = LMotion.Create<TValue, TOptions, TAdapter>(settings, true)
+                    .Bind(this, (x, state) =>
+                    {
+                        state.SetValue(target, state.GetRelativeValue(state.startValue, x));
+                    });
+            }
+            else
+            {
+                handle = LMotion.Create<TValue, TOptions, TAdapter>(settings, true)
+                    .Bind(this, (x, state) =>
+                    {
+                        state.SetValue(target, x);
+                    });
+            }
+
+            return handle;
+        }
+
         protected abstract TValue GetValue(TObject target);
         protected abstract void SetValue(TObject target, in TValue value);
         protected abstract TValue GetRelativeValue(in TValue startValue, in TValue relativeValue);

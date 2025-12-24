@@ -83,14 +83,14 @@ namespace LitMotion
         /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
         /// <param name="settings">Motion settings</param>
         /// <returns>Created motion builder</returns>
-        public static MotionBuilder<TValue, TOptions, TAdapter> Create<TValue, TOptions, TAdapter>(MotionSettings<TValue, TOptions> settings)
+        public static MotionBuilder<TValue, TOptions, TAdapter> Create<TValue, TOptions, TAdapter>(MotionSettings<TValue, TOptions> settings, bool swapStartEnd = false)
             where TValue : unmanaged
             where TOptions : unmanaged, IMotionOptions
             where TAdapter : unmanaged, IMotionAdapter<TValue, TOptions>
         {
             var buffer = MotionBuilderBuffer<TValue, TOptions>.Rent();
-            buffer.StartValue = settings.StartValue;
-            buffer.EndValue = settings.EndValue;
+            buffer.StartValue = swapStartEnd ? settings.EndValue : settings.StartValue;
+            buffer.EndValue = swapStartEnd ? settings.StartValue : settings.EndValue;
             buffer.Duration = settings.Duration;
             buffer.Options = settings.Options;
             buffer.Ease = settings.Ease;

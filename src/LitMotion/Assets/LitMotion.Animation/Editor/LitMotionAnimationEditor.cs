@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.SceneManagement;
 
 namespace LitMotion.Animation.Editor
 {
@@ -44,6 +45,12 @@ namespace LitMotion.Animation.Editor
         void OnEnable()
         {
             EditorApplication.playModeStateChanged += OnPlayModeStateChanged;
+
+            if (PrefabStageUtility.GetCurrentPrefabStage() != null)
+            {
+                PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+                PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+            }
         }
 
         void OnDisable()
@@ -95,6 +102,8 @@ namespace LitMotion.Animation.Editor
             var box = CreateBox("Settings");
             box.Add(new PropertyField(serializedObject.FindProperty("autoPlayMode")));
             box.Add(new PropertyField(serializedObject.FindProperty("animationMode")));
+            box.Add(new PropertyField(serializedObject.FindProperty("isPlayForward")));
+            box.Add(new PropertyField(serializedObject.FindProperty("manualLoop")));
             return box;
         }
 
@@ -128,7 +137,11 @@ namespace LitMotion.Animation.Editor
                     alignSelf = Align.Center
                 }
             };
-            addButton.clicked += () => dropdown.Show(addButton.worldBound);
+            addButton.clicked += () =>
+            {
+                GUI.skin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
+                dropdown.Show(addButton.worldBound);
+            };
             box.Add(addButton);
 
             box.schedule.Execute(() =>
@@ -145,6 +158,24 @@ namespace LitMotion.Animation.Editor
             {
                 if (componentsProperty.arraySize != prevArraySize)
                 {
+                    if (prevArraySize < componentsProperty.arraySize)
+                    {
+                        var seen = new HashSet<object>();
+                        bool dirty = false;
+                        for (int i = 0; i < componentsProperty.arraySize; ++i)
+                        {
+                            var element = componentsProperty.GetArrayElementAtIndex(i);
+                            var value = element.managedReferenceValue;
+                            if (value != null && !seen.Add(value))
+                            {
+                                var cloned = JsonUtility.FromJson(JsonUtility.ToJson(value), value.GetType());
+                                element.managedReferenceValue = cloned;
+                                dirty = true;
+                            }
+                        }
+                        if (dirty)
+                            serializedObject.ApplyModifiedProperties();
+                    }
                     RefleshComponentsView(true);
                     prevArraySize = componentsProperty.arraySize;
                 }
@@ -192,16 +223,23 @@ namespace LitMotion.Animation.Editor
                     flexGrow = 1f,
                 }
             };
-            var playButton = new Button(() => ((LitMotionAnimation)target).Play())
+            var playButton = new Button(() => ((LitMotionAnimation)target).PlayForward())
             {
                 text = "Play",
                 style = {
                     flexGrow = 1f,
                 }
             };
-            var restartButton = new Button(() => ((LitMotionAnimation)target).Restart())
+            var playReverse = new Button(() => ((LitMotionAnimation)target).PlayBackward())
             {
-                text = "Restart",
+                text = "Reverse",
+                style = {
+                    flexGrow = 1f,
+                }
+            };
+            var restartButton = new Button(() => ((LitMotionAnimation)target).Resume())
+            {
+                text = "Resume",
                 style = {
                     flexGrow = 1f,
                 }
@@ -222,6 +260,7 @@ namespace LitMotion.Animation.Editor
             };
 
             buttonGroup.Add(playButton);
+            buttonGroup.Add(playReverse);
             buttonGroup.Add(restartButton);
             buttonGroup.Add(stopButton);
             buttonGroup.Add(resetButton);
@@ -344,6 +383,15 @@ namespace LitMotion.Animation.Editor
         bool IsActive()
         {
             return !((LitMotionAnimation)target).IsActive;
+        }
+
+        void OnPrefabStageClosing(PrefabStage stage)
+        {
+            PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+            foreach (var i in stage.prefabContentsRoot.GetComponentsInChildren<LitMotionAnimation>(true))
+            {
+                i.Stop();
+            }
         }
     }
 }

@@ -100,6 +100,7 @@ namespace LitMotion
                         runner = new UpdateRunner<TValue, TOptions, TAdapter>(storage, Time.timeAsDouble, Time.unscaledTimeAsDouble, Time.realtimeSinceStartupAsDouble);
                     }
                     GetRunnerList(playerLoopTiming).Add(runner);
+
                     return (runner, true);
                 }
                 return (runner, false);

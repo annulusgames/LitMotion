@@ -17,17 +17,6 @@ namespace LitMotion
     public static class MotionHandleExtensions
     {
         /// <summary>
-        /// Checks if a motion is valid.
-        /// </summary>
-        /// <param name="handle">This motion handle</param>
-        /// <returns>True if motion is valid, otherwise false.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValid(this MotionHandle handle)
-        {
-            return MotionManager.IsValid(handle);
-        }
-
-        /// <summary>
         /// Checks if a motion is active.
         /// </summary>
         /// <param name="handle">This motion handle</param>

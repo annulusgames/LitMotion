@@ -69,13 +69,6 @@ namespace LitMotion
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsValid(MotionHandle handle)
-        {
-            if (handle.StorageId < 0 || handle.StorageId >= MotionTypeCount) return false;
-            return list[handle.StorageId].IsValid(handle);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsActive(MotionHandle handle)
         {
             if (handle.StorageId < 0 || handle.StorageId >= MotionTypeCount) return false;
@@ -122,5 +115,6 @@ namespace LitMotion
                 throw new ArgumentException("Invalid type id.");
             }
         }
+
     }
 }
