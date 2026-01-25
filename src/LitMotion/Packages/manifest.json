@@ -5,7 +5,6 @@
     "com.neuecc.unirx": "https://github.com/neuecc/UniRx.git?path=Assets/Plugins/UniRx/Scripts",
     "com.unity.ide.visualstudio": "2.0.25",
     "com.unity.render-pipelines.universal": "17.3.0",
-    "com.unity.toolchain.macos-arm64-linux-x86_64": "2.0.5",
     "com.unity.ugui": "2.0.0",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.adaptiveperformance": "1.0.0",
