@@ -142,7 +142,7 @@ namespace LitMotion
                     return ref postLateUpdateRunners;
                 case PlayerLoopTiming.TimeUpdate:
                     return ref timeUpdateRunners;
-            };
+            }
         }
 
         static Action<Exception> unhandledException = DefaultUnhandledExceptionHandler;
@@ -172,7 +172,10 @@ namespace LitMotion
 
         static void DefaultUnhandledExceptionHandler(Exception exception)
         {
+#if UNITY_EDITOR
+            Debug.LogError("EDITOR ONLY");
             Debug.LogException(exception);
+#endif
         }
 
         /// <summary>
