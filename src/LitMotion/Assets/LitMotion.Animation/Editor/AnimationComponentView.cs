@@ -9,11 +9,13 @@ namespace LitMotion.Animation.Editor
         VisualElement container;
         readonly VisualElement contextMenuButton;
         readonly Foldout foldout;
+        readonly Toggle foldoutToggle;
         readonly VisualElement icon;
         readonly Toggle enabledToggle;
         readonly ProgressBar progressBar;
 
         public Foldout Foldout => foldout;
+        public Toggle FoldoutToggle => foldoutToggle;
         public Toggle EnabledToggle => enabledToggle;
         public VisualElement ContextMenuButton => contextMenuButton;
 
@@ -61,6 +63,7 @@ namespace LitMotion.Animation.Editor
             };
             root.Add(foldout);
             foldout.Add(new VisualElement() { style = { height = 5f } });
+            foldoutToggle = foldout.Q<Toggle>();
             var foldoutCheck = foldout.Q(className: Foldout.checkmarkUssClassName);
             icon = new VisualElement
             {
@@ -84,7 +87,7 @@ namespace LitMotion.Animation.Editor
             {
                 enabledToggle.pickingMode = PickingMode.Ignore;
                 enabledToggle.Q(className: Toggle.inputUssClassName).pickingMode = PickingMode.Ignore;
-                enabledToggle.Q(className: Toggle.textUssClassName).pickingMode = PickingMode.Ignore;
+                // enabledToggle.Q(className: Toggle.textUssClassName).pickingMode = PickingMode.Ignore; # エラーが出るのでコメント
                 enabledToggle.Q(className: Toggle.checkmarkUssClassName).pickingMode = PickingMode.Position;
             });
             foldoutCheck.parent.Add(enabledToggle);
@@ -127,7 +130,9 @@ namespace LitMotion.Animation.Editor
             };
             root.Add(contextMenuButton);
 
-            container = foldout.contentContainer;
+            var dynamicContainer = new VisualElement { name = "dynamic-container" };
+            container = dynamicContainer;
+            foldout.contentContainer.Add(container);
         }
 
         public new void SetEnabled(bool enabled)
