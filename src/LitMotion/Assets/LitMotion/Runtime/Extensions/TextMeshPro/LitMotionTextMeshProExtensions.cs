@@ -15,6 +15,8 @@ namespace LitMotion.Extensions
     /// </summary>
     public static class LitMotionTextMeshProExtensions
     {
+        private static void StaticOnComplete(TextMeshProMotionAnimator animator, int charIndex) => animator.CompleteForChar(charIndex);
+        
         /// <summary>
         /// Create a motion data and bind it to TMP_Text.fontSize
         /// </summary>
@@ -587,10 +589,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+            
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].color = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -613,10 +617,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].color.r = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -639,10 +645,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+    
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].color.g = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -665,10 +673,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].color.b = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -691,10 +701,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].color.a = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -717,10 +729,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].position = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -743,10 +757,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+            
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].position.x = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -769,10 +785,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+            
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].position.y = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -795,10 +813,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+            
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].position.z = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -821,10 +841,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].rotation = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -847,10 +869,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].rotation = Quaternion.Euler(x);
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -873,12 +897,14 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 var eulerAngles = animator.charInfoArray[charIndex.Value].rotation.eulerAngles;
                 eulerAngles.x = x;
                 animator.charInfoArray[charIndex.Value].rotation = Quaternion.Euler(eulerAngles);
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -901,12 +927,14 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 var eulerAngles = animator.charInfoArray[charIndex.Value].rotation.eulerAngles;
                 eulerAngles.y = x;
                 animator.charInfoArray[charIndex.Value].rotation = Quaternion.Euler(eulerAngles);
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -929,12 +957,14 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 var eulerAngles = animator.charInfoArray[charIndex.Value].rotation.eulerAngles;
                 eulerAngles.z = x;
                 animator.charInfoArray[charIndex.Value].rotation = Quaternion.Euler(eulerAngles);
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -957,10 +987,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].scale = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -983,10 +1015,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].scale.x = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -1009,10 +1043,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].scale.y = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;
@@ -1035,10 +1071,12 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.updateAction).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
+
+            int index = charIndex;
+            var handle = builder.WithOnComplete(() => StaticOnComplete(animator, index)).Bind(animator, Box.Create(charIndex), static (x, animator, charIndex) =>
             {
                 animator.charInfoArray[charIndex.Value].scale.z = x;
-                animator.SetDirty();
+                animator.SetCharDirty(charIndex.Value);
             });
 
             return handle;

@@ -47,7 +47,10 @@ namespace LitMotion.Extensions
         {
             if (textToAnimator.TryGetValue(text, out var animator))
             {
-                animator.Reset();
+                if (!animator.GetIsDirty())
+                {
+                    animator.Reset();
+                }
                 return animator;
             }
 
@@ -158,6 +161,7 @@ namespace LitMotion.Extensions
             public Vector3 scale;
             public Quaternion rotation;
             public Color color;
+            public bool isDirty;
         }
 
         public TextMeshProMotionAnimator()
@@ -169,16 +173,15 @@ namespace LitMotion.Extensions
                 charInfoArray[i].rotation = Quaternion.identity;
                 charInfoArray[i].scale = Vector3.one;
                 charInfoArray[i].position = Vector3.zero;
+                charInfoArray[i].isDirty = false;
             }
-
-            updateAction = UpdateCore;
         }
 
         TMP_Text target;
-        internal readonly Action updateAction;
         internal CharInfo[] charInfoArray;
-        bool isDirty;
-
+        bool dirtyFromComplete;
+        int lastDirtyChar = -1;
+        
         TextMeshProMotionAnimator nextNode;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -197,23 +200,32 @@ namespace LitMotion.Extensions
                         charInfoArray[i].rotation = Quaternion.identity;
                         charInfoArray[i].scale = Vector3.one;
                         charInfoArray[i].position = Vector3.zero;
+                        charInfoArray[i].isDirty = false;
                     }
                 }
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Update()
+        public void SetCharDirty(int charIndex)
         {
-            TryUpdate();
+            EnsureCapacity(charIndex + 1);
+            if (charIndex > lastDirtyChar)
+            {
+                lastDirtyChar = charIndex;
+            }
+            charInfoArray[charIndex].isDirty = true;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetDirty()
+        bool GetIsDirty()
         {
-            isDirty = true;
+            if (dirtyFromComplete)
+            {
+                return true;
+            }
+            return lastDirtyChar >= 0;
         }
-
+        
         public void Reset()
         {
             for (int i = 0; i < charInfoArray.Length; i++)
@@ -222,29 +234,27 @@ namespace LitMotion.Extensions
                 charInfoArray[i].rotation = Quaternion.identity;
                 charInfoArray[i].scale = Vector3.one;
                 charInfoArray[i].position = Vector3.zero;
+                charInfoArray[i].isDirty = false;
             }
-
-            isDirty = false;
+            dirtyFromComplete = false;
         }
-
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         bool TryUpdate()
         {
             if (target == null) return false;
-
-            if (isDirty)
+            
+            if (GetIsDirty())
             {
                 UpdateCore();
+                return true;
             }
-
-            return true;
+            return false;
         }
 
         void UpdateCore()
         {
             target.ForceMeshUpdate();
-
             var textInfo = target.textInfo;
             EnsureCapacity(textInfo.characterCount);
 
@@ -288,6 +298,30 @@ namespace LitMotion.Extensions
                 textInfo.meshInfo[i].mesh.vertices = textInfo.meshInfo[i].vertices;
                 target.UpdateGeometry(textInfo.meshInfo[i].mesh, i);
             }
+
+            if (dirtyFromComplete)
+            {
+                dirtyFromComplete = false;
+            }
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void CompleteForChar(int charIndex)
+        {
+            EnsureCapacity(charIndex + 1);
+            charInfoArray[charIndex].isDirty = false;
+            if (charIndex >= lastDirtyChar)
+            {
+                lastDirtyChar = -1;
+                for (int i = charIndex; i >= 0; i--)
+                {
+                    if (charInfoArray[i].isDirty)
+                    {
+                        lastDirtyChar = i;
+                    }
+                }
+            }
+            dirtyFromComplete = true;
         }
     }
 }
