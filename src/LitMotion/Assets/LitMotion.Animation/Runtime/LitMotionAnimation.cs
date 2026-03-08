@@ -21,6 +21,7 @@ namespace LitMotion.Animation
             Sequential
         }
 
+        [SerializeField] string animationName;
         [SerializeField] AutoPlayMode autoPlayMode = AutoPlayMode.OnStart;
         [SerializeField] AnimationMode animationMode;
 
