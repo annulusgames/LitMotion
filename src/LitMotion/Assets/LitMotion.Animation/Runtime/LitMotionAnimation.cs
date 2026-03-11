@@ -36,9 +36,9 @@ namespace LitMotion.Animation
 
         public IReadOnlyList<LitMotionAnimationComponent> Components => components;
 
-        public string AnimationName => animationName;
-        public AutoPlayMode AutoPlayMode => autoPlayMode;
-        public AnimationMode AnimationMode => animationMode;
+        public string AnimationNameValue => animationName;
+        public AutoPlayMode AutoPlayModeValue => autoPlayMode;
+        public AnimationMode AnimationModeValue => animationMode;
 
         void OnEnable()
         {
