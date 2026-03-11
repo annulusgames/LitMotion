@@ -8,14 +8,14 @@ namespace LitMotion.Animation
     [AddComponentMenu("LitMotion Animation")]
     public sealed class LitMotionAnimation : MonoBehaviour, ISerializationCallbackReceiver
     {
-        enum AutoPlayMode
+        public enum AutoPlayMode
         {
             None,
             OnStart,
             OnEnable
         }
 
-        enum AnimationMode
+        public enum AnimationMode
         {
             Parallel,
             Sequential
