@@ -96,6 +96,7 @@ namespace LitMotion.Animation.Editor
             box.Add(new PropertyField(serializedObject.FindProperty("animationName")));
             box.Add(new PropertyField(serializedObject.FindProperty("autoPlayMode")));
             box.Add(new PropertyField(serializedObject.FindProperty("animationMode")));
+            box.Add(new PropertyField(serializedObject.FindProperty("preserve")));
             return box;
         }
 
