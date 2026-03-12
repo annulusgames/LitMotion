@@ -32,5 +32,8 @@ namespace LitMotion.Animation
         public virtual void OnStop() { }
 
         public MotionHandle TrackedHandle { get; set; }
+#if UNITY_EDITOR
+        [SerializeField, HideInInspector] bool foldoutOn = true;
+#endif
     }
 }
