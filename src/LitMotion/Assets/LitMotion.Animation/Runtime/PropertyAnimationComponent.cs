@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace LitMotion.Animation
 {
+    [Serializable]
     public abstract class PropertyAnimationComponent<TObject, TValue, TOptions, TAdapter> : LitMotionAnimationComponent
         where TObject : UnityEngine.Object
         where TValue : unmanaged
