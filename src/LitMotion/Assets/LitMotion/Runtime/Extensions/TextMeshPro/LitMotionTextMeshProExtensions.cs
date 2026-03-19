@@ -829,25 +829,6 @@ namespace LitMotion.Extensions
         }
 
         /// <summary>
-        /// Create motion data and bind it to the character position.xyz.
-        /// </summary>
-        /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
-        /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
-        /// <param name="builder">This builder</param>
-        /// <param name="text">Target TMP_Text</param>
-        /// <param name="charIndex">Target character index</param>
-        /// <returns>Handle of the created motion data.</returns>
-        public static MotionHandle BindToTMPCharPositionXYZ<TOptions, TAdapter>(this MotionBuilder<float, TOptions, TAdapter> builder, TMP_Text text, int charIndex)
-            where TOptions : unmanaged, IMotionOptions
-            where TAdapter : unmanaged, IMotionAdapter<float, TOptions>
-        {
-            return builder.BindToTMPChar(text, charIndex, static (float x, int _, ref TMPMotionCharacter c) =>
-            {
-                c.Position = new Vector3(x, x, x);
-            });
-        }
-
-        /// <summary>
         /// Create motion data and bind it to the character rotation.
         /// </summary>
         /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
@@ -1011,25 +992,6 @@ namespace LitMotion.Extensions
                 eulerAngles.x = x.x;
                 eulerAngles.z = x.y;
                 c.Rotation = Quaternion.Euler(eulerAngles);
-            });
-        }
-
-        /// <summary>
-        /// Create motion data and bind it to the character rotation (using euler angles).
-        /// </summary>
-        /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
-        /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
-        /// <param name="builder">This builder</param>
-        /// <param name="text">Target TMP_Text</param>
-        /// <param name="charIndex">Target character index</param>
-        /// <returns>Handle of the created motion data.</returns>
-        public static MotionHandle BindToTMPCharEulerAnglesXYZ<TOptions, TAdapter>(this MotionBuilder<float, TOptions, TAdapter> builder, TMP_Text text, int charIndex)
-            where TOptions : unmanaged, IMotionOptions
-            where TAdapter : unmanaged, IMotionAdapter<float, TOptions>
-        {
-            return builder.BindToTMPChar(text, charIndex, static (float x, int _, ref TMPMotionCharacter c) =>
-            {
-                c.Rotation = Quaternion.Euler(x, x, x);
             });
         }
 
