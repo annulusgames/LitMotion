@@ -48,6 +48,7 @@ namespace LitMotion.Extensions
             if (textToAnimator.TryGetValue(text, out var animator))
             {
                 animator.Reset();
+                animator.refCount++;
                 return animator;
             }
 
@@ -59,6 +60,9 @@ namespace LitMotion.Extensions
             // set target
             animator.target = text;
             animator.Reset();
+
+            // increment ref count
+            animator.refCount++;
 
             // add to array
             if (tail == animators.Length)
@@ -172,12 +176,15 @@ namespace LitMotion.Extensions
             }
 
             updateAction = UpdateCore;
+            completeAction = CompleteCore;
         }
 
         TMP_Text target;
         internal readonly Action updateAction;
+        internal readonly Action completeAction;
         internal CharInfo[] charInfoArray;
         bool isDirty;
+        int refCount;
 
         TextMeshProMotionAnimator nextNode;
 
@@ -231,7 +238,7 @@ namespace LitMotion.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         bool TryUpdate()
         {
-            if (target == null) return false;
+            if (target == null || refCount <= 0) return false;
 
             if (isDirty)
             {
@@ -288,6 +295,12 @@ namespace LitMotion.Extensions
                 textInfo.meshInfo[i].mesh.vertices = textInfo.meshInfo[i].vertices;
                 target.UpdateGeometry(textInfo.meshInfo[i].mesh, i);
             }
+        }
+
+        void CompleteCore()
+        {
+            UpdateCore();
+            refCount--;
         }
     }
 }
