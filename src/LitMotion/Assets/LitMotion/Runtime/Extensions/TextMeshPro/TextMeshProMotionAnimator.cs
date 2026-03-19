@@ -295,6 +295,8 @@ namespace LitMotion.Extensions
                 textInfo.meshInfo[i].mesh.vertices = textInfo.meshInfo[i].vertices;
                 target.UpdateGeometry(textInfo.meshInfo[i].mesh, i);
             }
+
+            isDirty = false;
         }
 
         void CompleteCore()
