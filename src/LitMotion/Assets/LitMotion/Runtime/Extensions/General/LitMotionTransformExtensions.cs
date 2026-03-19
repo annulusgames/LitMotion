@@ -785,5 +785,24 @@ namespace LitMotion.Extensions
                 t.localScale = p;
             });
         }
+
+        /// <summary>
+        /// Create a motion data and bind it to Transform.localScale.xyz
+        /// </summary>
+        /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
+        /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
+        /// <param name="builder">This builder</param>
+        /// <param name="transform"></param>
+        /// <returns>Handle of the created motion data.</returns>
+        public static MotionHandle BindToLocalScaleXYZ<TOptions, TAdapter>(this MotionBuilder<float, TOptions, TAdapter> builder, Transform transform)
+            where TOptions : unmanaged, IMotionOptions
+            where TAdapter : unmanaged, IMotionAdapter<float, TOptions>
+        {
+            Error.IsNull(transform);
+            return builder.Bind(transform, static (x, t) =>
+            {
+                t.localScale = new Vector3(x, x, x);
+            });
+        }
     }
 }
