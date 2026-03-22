@@ -25,6 +25,14 @@ namespace LitMotion
             CheckTypeId(handle);
             return ref list[handle.StorageId].GetDataRef(handle, checkIsInSequence);
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ref MotionData<TValue, TOptions> GetTypeDataRef<TValue, TOptions>(MotionHandle handle, bool checkIsInSequence = true)
+            where TValue : unmanaged
+            where TOptions : unmanaged, IMotionOptions
+        {
+            CheckTypeId(handle);
+            return ref list[handle.StorageId].GetTypeDataRef<TValue, TOptions>(handle, checkIsInSequence);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref ManagedMotionData GetManagedDataRef(MotionHandle handle, bool checkIsInSequence = true)

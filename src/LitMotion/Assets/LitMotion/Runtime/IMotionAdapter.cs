@@ -18,5 +18,12 @@ namespace LitMotion
         /// <param name="context">Animation context</param>
         /// <returns>Current value</returns>
         TValue Evaluate(ref TValue startValue, ref TValue endValue, ref TOptions options, in MotionEvaluationContext context);
+
+        bool IsCompleted(ref TValue startValue, ref TValue endValue, ref TOptions options)
+        {
+            return false;
+        }
+
+        bool IsDurationBased => true;
     }
 }
