@@ -176,6 +176,17 @@ namespace LitMotion
             return handle;
         }
 
+        /// <summary>
+        /// Add this motion handle to R3 CompositeDisposable.
+        /// </summary>
+        /// <param name="handle">This motion handle</param>
+        /// <param name="disposable">Target CompositeDisposable</param>
+        public static MotionHandle AddTo(this MotionHandle handle, global::R3.CompositeDisposable disposable)
+        {
+            disposable.Add(handle.ToDisposable());
+            return handle;
+        }
+
 #if UNITY_2022_2_OR_NEWER
         /// <summary>
         /// Link the motion lifecycle to the target object.
