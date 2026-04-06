@@ -23,6 +23,7 @@ namespace LitMotion.Animation
 
         [SerializeField] AutoPlayMode autoPlayMode = AutoPlayMode.OnStart;
         [SerializeField] AnimationMode animationMode;
+        [SerializeField] bool preserve = true;
 
         [SerializeReference]
         LitMotionAnimationComponent[] components;
@@ -58,7 +59,8 @@ namespace LitMotion.Animation
 
                     if (isActive)
                     {
-                        handle.Preserve();
+                        if (preserve)
+                            handle.Preserve();
                         MotionManager.GetManagedDataRef(handle, false).OnCompleteAction += MoveNextMotion;
                     }
 
@@ -122,7 +124,8 @@ namespace LitMotion.Animation
 
                             if (handle.IsActive())
                             {
-                                handle.Preserve();
+                                if (preserve)
+                                    handle.Preserve();
                             }
 
                             playingComponents.Add(component);
