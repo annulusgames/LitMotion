@@ -1,6 +1,6 @@
 {
     "name": "com.annulusgames.lit-motion",
-    "version": "2.0.1",
+    "version": "2.0.2",
     "displayName": "LitMotion",
     "description": "Lightning-fast and Zero Allocation Tween Library for Unity.",
     "keywords": [
