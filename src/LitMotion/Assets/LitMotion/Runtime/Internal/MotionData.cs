@@ -54,10 +54,11 @@ namespace LitMotion
 
         public MotionState State;
         public MotionParameters Parameters;
+        public double CurrentLoopStartTime;
 
         public readonly double TimeSinceStart => State.Time - Parameters.Delay;
 
-        public void Update(double time, out float progress)
+        public void UpdateDurationBasedState(double time, out float progress)
         {
             State.PrevCompletedLoops = State.CompletedLoops;
             State.PrevStatus = State.Status;
@@ -172,6 +173,41 @@ namespace LitMotion
             }
         }
 
+        public void UpdateIterationState(double time, double deltaTime,bool isOnceCompleted)
+        {
+            State.PrevCompletedLoops = State.CompletedLoops;
+            State.PrevStatus = State.Status;
+            State.Time = time;
+            bool isDelayed;
+            if(time == 0 || (isOnceCompleted && State.CompletedLoops <= Parameters.Loops - 1))
+            {
+                CurrentLoopStartTime = time;
+            }
+            if (Parameters.DelayType == DelayType.FirstLoop)
+                isDelayed = TimeSinceStart < 0f;
+            else
+            {
+                isDelayed = State.Time - CurrentLoopStartTime - Parameters.Delay < 0f;
+            }
+                
+            if (isOnceCompleted)
+            {
+                State.CompletedLoops++;
+            }
+            if (isOnceCompleted && Parameters.Loops >= 0 && State.CompletedLoops > Parameters.Loops - 1)
+            {
+                State.Status = MotionStatus.Completed;
+            }
+            else if (isDelayed || State.Time < 0)
+            {
+                State.Status = MotionStatus.Delayed;
+            }
+            else
+            {
+                State.Status = MotionStatus.Playing;
+            }
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Complete(out float progress)
         {
@@ -224,34 +260,99 @@ namespace LitMotion
         public TValue EndValue;
         public TOptions Options;
 
-        public void Update<TAdapter>(double time, out TValue result)
+        public void Update<TAdapter>(double time, double deltaTime, out TValue result)
             where TAdapter : unmanaged, IMotionAdapter<TValue, TOptions>
         {
-            Core.Update(time, out var progress);
-
-            result = default(TAdapter).Evaluate(ref StartValue, ref EndValue, ref Options, new MotionEvaluationContext()
+            bool isDurationBased = default(TAdapter).IsDurationBased;
+            if (isDurationBased)
             {
-                Progress = progress,
-                Time = time,
-            });
+                Core.UpdateDurationBasedState(time, out var progress);
+                result = default(TAdapter).Evaluate(ref StartValue, ref EndValue, ref Options, new MotionEvaluationContext()
+                {
+                    Progress = progress,
+                    Time = time,
+                    DeltaTime = deltaTime,
+                });
+            }
+            else
+            {
+                bool isOnceCompleted = false;
+                if (time <= 0 || Core.State.Status == MotionStatus.Scheduled)
+                    Core.UpdateIterationState(time, deltaTime, false);
+
+                if (Core.State.Status == MotionStatus.Delayed)
+                    result = StartValue;
+                else if (Core.State.Status == MotionStatus.Completed)
+                    result = EndValue;
+                else
+                {
+                    if (Core.Parameters.LoopType == LoopType.Restart)
+                    {
+                        result = default(TAdapter).Evaluate(ref StartValue, ref EndValue, ref Options, new MotionEvaluationContext()
+                        {
+                            Time = time,
+                            DeltaTime = deltaTime,
+                        });
+                        isOnceCompleted = default(TAdapter).IsCompleted(ref StartValue, ref EndValue, ref Options);
+                        if (isOnceCompleted && Core.State.Status == MotionStatus.Playing)
+                            Options.Restart();
+                    }
+                    else if (Core.Parameters.LoopType == LoopType.Flip || Core.Parameters.LoopType == LoopType.Yoyo)
+                    {
+                        var isOdd = Core.State.CompletedLoops % 2 == 1;
+                        result = isOdd
+                            ? default(TAdapter).Evaluate(ref EndValue, ref StartValue, ref Options, new MotionEvaluationContext()
+                            {
+                                Time = time,
+                                DeltaTime = deltaTime,
+                            })
+                            : default(TAdapter).Evaluate(ref StartValue, ref EndValue, ref Options, new MotionEvaluationContext()
+                            {
+                                Time = time,
+                                DeltaTime = deltaTime,
+                            });
+                        isOnceCompleted = isOdd
+                        ? default(TAdapter).IsCompleted(ref EndValue, ref StartValue, ref Options) 
+                        : default(TAdapter).IsCompleted(ref StartValue, ref EndValue, ref Options);
+                    }
+                    else
+                    {
+
+                        result = default(TAdapter).Evaluate(ref StartValue, ref EndValue, ref Options, new MotionEvaluationContext()
+                        {
+                            Time = time,
+                            DeltaTime = deltaTime,
+                        });
+                        isOnceCompleted = default(TAdapter).IsCompleted(ref StartValue, ref EndValue, ref Options);
+                    }
+                }
+                Core.UpdateIterationState(time, deltaTime, isOnceCompleted);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Complete<TAdapter>(out TValue result)
             where TAdapter : unmanaged, IMotionAdapter<TValue, TOptions>
         {
+            bool isDurationBased = default(TAdapter).IsDurationBased;
             Core.Complete(out var progress);
-
-            result = default(TAdapter).Evaluate(
-                ref StartValue,
-                ref EndValue,
-                ref Options,
-                new()
-                {
-                    Progress = progress,
-                    Time = Core.State.Time,
-                }
-            );
+            if (isDurationBased)
+            {
+                result = default(TAdapter).Evaluate(
+                    ref StartValue,
+                    ref EndValue,
+                    ref Options,
+                    new()
+                    {
+                        Progress = progress,
+                        Time = Core.State.Time,
+                    }
+                );
+            }
+            else
+            {
+                result = EndValue;
+            }
         }
     }
 }

@@ -16,8 +16,7 @@ namespace LitMotionSamples
                 var direction = i % 2 == 0 ? 1 : -1;
                 yield return LMotion.Create(-5f * direction, 5f * direction, 2f)
                     .WithEase(Ease.InOutSine)
-                    .BindToPositionX(targets[i])
-                    .ToYieldInteraction();
+                    .BindToPositionX(targets[i]);
             }
         }
     }
