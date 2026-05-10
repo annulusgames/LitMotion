@@ -46,6 +46,54 @@ namespace LitMotion
                 target.Value = x;
             });
         }
+
+        /// <summary>
+        /// Add this motion handle to R3 CompositeDisposable.
+        /// </summary>
+        /// <param name="handle">This motion handle</param>
+        /// <param name="disposable">Target CompositeDisposable</param>
+        /// <param name="disposeBehavior">Behavior when the disposable is disposed</param>
+        public static MotionHandle AddTo(this MotionHandle handle, CompositeDisposable disposable, DisposeBehavior disposeBehavior = DisposeBehavior.Cancel)
+        {
+            disposable.Add(handle.ToDisposable(disposeBehavior));
+            return handle;
+        }
+
+        /// <summary>
+        /// Add this motion handle to R3 SerialDisposable.
+        /// </summary>
+        /// <param name="handle">This motion handle</param>
+        /// <param name="disposable">Target SerialDisposable</param>
+        /// <param name="disposeBehavior">Behavior when the disposable is disposed</param>
+        public static MotionHandle AddTo(this MotionHandle handle, SerialDisposable disposable, DisposeBehavior disposeBehavior = DisposeBehavior.Cancel)
+        {
+            disposable.Disposable = handle.ToDisposable(disposeBehavior);
+            return handle;
+        }
+
+        /// <summary>
+        /// Add this motion handle to R3 DisposableBag.
+        /// </summary>
+        /// <param name="handle">This motion handle</param>
+        /// <param name="disposable">Target DisposableBag</param>
+        /// <param name="disposeBehavior">Behavior when the disposable is disposed</param>
+        public static MotionHandle AddTo(this MotionHandle handle, ref DisposableBag disposable, DisposeBehavior disposeBehavior = DisposeBehavior.Cancel)
+        {
+            disposable.Add(handle.ToDisposable(disposeBehavior));
+            return handle;
+        }
+
+        /// <summary>
+        /// Add this motion handle to R3 DisposableBuilder.
+        /// </summary>
+        /// <param name="handle">This motion handle</param>
+        /// <param name="disposable">Target DisposableBuilder</param>
+        /// <param name="disposeBehavior">Behavior when the disposable is disposed</param>
+        public static MotionHandle AddTo(this MotionHandle handle, ref DisposableBuilder disposable, DisposeBehavior disposeBehavior = DisposeBehavior.Cancel)
+        {
+            disposable.Add(handle.ToDisposable(disposeBehavior));
+            return handle;
+        }
     }
 }
 #endif
