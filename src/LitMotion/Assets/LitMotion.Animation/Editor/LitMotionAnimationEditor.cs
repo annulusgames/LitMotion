@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.SceneManagement;
 
 namespace LitMotion.Animation.Editor
 {
@@ -210,7 +211,14 @@ namespace LitMotion.Animation.Editor
                     flexGrow = 1f,
                 }
             };
-            var playButton = new Button(() => ((LitMotionAnimation)target).Play())
+            var playButton = new Button(() => {
+                ((LitMotionAnimation)target).Play();
+                if (PrefabStageUtility.GetCurrentPrefabStage() != null)
+                {
+                    PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+                    PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+                }
+            })
             {
                 text = "Play",
                 style = {
@@ -362,6 +370,15 @@ namespace LitMotion.Animation.Editor
         bool IsActive()
         {
             return !((LitMotionAnimation)target).IsActive;
+        }
+
+        void OnPrefabStageClosing(PrefabStage stage)
+        {
+            PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+            foreach (var  i in stage.prefabContentsRoot.GetComponentsInChildren<LitMotionAnimation>(true))
+            {
+                i.Stop();
+            }
         }
     }
 }
