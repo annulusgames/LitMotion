@@ -72,7 +72,7 @@ namespace LitMotion.Animation
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogException(ex);
+                    Debug.LogException(ex, context: this);
                 }
             }
         }
@@ -129,7 +129,7 @@ namespace LitMotion.Animation
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogException(ex);
+                            Debug.LogException(ex, context: this);
                         }
                     }
                     break;

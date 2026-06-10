@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor.SceneManagement;
 
 namespace LitMotion.Animation.Editor
 {
@@ -145,6 +146,24 @@ namespace LitMotion.Animation.Editor
             {
                 if (componentsProperty.arraySize != prevArraySize)
                 {
+                    if (prevArraySize < componentsProperty.arraySize)
+                    {
+                        var seen = new HashSet<object>();
+                        bool dirty = false;
+                        for (int i = 0; i < componentsProperty.arraySize; ++i)
+                        {
+                            var element = componentsProperty.GetArrayElementAtIndex(i);
+                            var value = element.managedReferenceValue;
+                            if (value != null && !seen.Add(value))
+                            {
+                                var cloned = JsonUtility.FromJson(JsonUtility.ToJson(value), value.GetType());
+                                element.managedReferenceValue = cloned;
+                                dirty = true;
+                            }
+                        }
+                        if (dirty)
+                            serializedObject.ApplyModifiedProperties();
+                    }
                     RefleshComponentsView(true);
                     prevArraySize = componentsProperty.arraySize;
                 }
@@ -192,7 +211,14 @@ namespace LitMotion.Animation.Editor
                     flexGrow = 1f,
                 }
             };
-            var playButton = new Button(() => ((LitMotionAnimation)target).Play())
+            var playButton = new Button(() => {
+                ((LitMotionAnimation)target).Play();
+                if (PrefabStageUtility.GetCurrentPrefabStage() != null)
+                {
+                    PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+                    PrefabStage.prefabStageClosing += OnPrefabStageClosing;
+                }
+            })
             {
                 text = "Play",
                 style = {
@@ -344,6 +370,15 @@ namespace LitMotion.Animation.Editor
         bool IsActive()
         {
             return !((LitMotionAnimation)target).IsActive;
+        }
+
+        void OnPrefabStageClosing(PrefabStage stage)
+        {
+            PrefabStage.prefabStageClosing -= OnPrefabStageClosing;
+            foreach (var  i in stage.prefabContentsRoot.GetComponentsInChildren<LitMotionAnimation>(true))
+            {
+                i.Stop();
+            }
         }
     }
 }
