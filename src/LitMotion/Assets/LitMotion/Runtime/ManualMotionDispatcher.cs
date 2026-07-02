@@ -39,6 +39,14 @@ namespace LitMotion
         readonly ManualMotionDispatcherScheduler scheduler;
         readonly Dictionary<Type, IUpdateRunner> runners = new();
 
+        // Reused buffer so Update/Reset iterate a snapshot of the runners instead of the live
+        // dictionary. A motion callback fired during iteration can schedule the first motion of a
+        // new type, which lazily adds a runner (see GetOrCreateRunner) and would otherwise throw
+        // "InvalidOperationException: Collection was modified" mid-enumeration. Reused rather than
+        // allocated per call; AddRange(runners.Values) copies via ICollection.CopyTo and the
+        // Dictionary caches its ValueCollection, so this stays allocation-free after warmup.
+        readonly List<IUpdateRunner> runnerBuffer = new();
+
         public ManualMotionDispatcher()
         {
             scheduler = new(this);
@@ -79,10 +87,13 @@ namespace LitMotion
         {
             time += deltaTime;
 
-            foreach (var kv in runners)
+            runnerBuffer.Clear();
+            runnerBuffer.AddRange(runners.Values);
+            for (int i = 0; i < runnerBuffer.Count; i++)
             {
-                kv.Value.Update(time, time, time);
+                runnerBuffer[i].Update(time, time, time);
             }
+            runnerBuffer.Clear();
         }
 
         /// <summary>
@@ -90,10 +101,13 @@ namespace LitMotion
         /// </summary>
         public void Reset()
         {
-            foreach (var kv in runners)
+            runnerBuffer.Clear();
+            runnerBuffer.AddRange(runners.Values);
+            for (int i = 0; i < runnerBuffer.Count; i++)
             {
-                kv.Value.Reset();
+                runnerBuffer[i].Reset();
             }
+            runnerBuffer.Clear();
 
             time = 0;
         }
