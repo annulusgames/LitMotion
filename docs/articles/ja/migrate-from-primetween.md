@@ -65,7 +65,7 @@ tween.Kill();
 
 // LitMotion
 handle.PlaybackSpeed = 0f;
-handle.Complate();
+handle.Complete();
 handle.Cancel();
 ```
 
