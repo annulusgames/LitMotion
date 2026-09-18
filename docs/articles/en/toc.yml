@@ -42,7 +42,7 @@
 - name: LitMotion Debugger
   href: litmotion-debugger.md
 
-- name: Advanved
+- name: Advanced
 - name: Play Motion in Editor
   href: play-motion-in-editor.md
 - name: Exception Handling

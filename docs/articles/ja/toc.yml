@@ -42,7 +42,7 @@
 - name: LitMotion Debugger
   href: litmotion-debugger.md
 
-- name: Advanved
+- name: Advanced
 - name: Unity Editor上でモーションを再生する
   href: play-motion-in-editor.md
 - name: 例外処理
