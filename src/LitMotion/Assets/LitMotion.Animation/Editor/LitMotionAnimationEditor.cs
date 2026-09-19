@@ -129,7 +129,11 @@ namespace LitMotion.Animation.Editor
                     alignSelf = Align.Center
                 }
             };
-            addButton.clicked += () => dropdown.Show(addButton.worldBound);
+            addButton.clicked += () =>
+            {
+                GUI.skin = EditorGUIUtility.GetBuiltinSkin(EditorSkin.Scene);
+                dropdown.Show(addButton.worldBound);
+            };
             box.Add(addButton);
 
             box.schedule.Execute(() =>
