@@ -112,6 +112,34 @@ namespace LitMotion
             }
         }
 
+        public TValue GetEndValue<TValue, TOptions>(bool checkIsInSequence = true)
+            where TValue : unmanaged
+            where TOptions : unmanaged, IMotionOptions
+        {
+            return MotionManager.GetTypeDataRef<TValue, TOptions>(this, checkIsInSequence).EndValue;
+        }
+
+        public void SetEndValue<TValue, TOptions>(TValue value, bool checkIsInSequence = true)
+            where TValue : unmanaged
+            where TOptions : unmanaged, IMotionOptions
+        {
+            MotionManager.GetTypeDataRef<TValue, TOptions>(this, checkIsInSequence).EndValue = value;
+        }
+
+        public ref TValue GetEndValueRef<TValue, TOptions>(bool checkIsInSequence = true)
+            where TValue : unmanaged
+            where TOptions : unmanaged, IMotionOptions
+        {
+            return ref MotionManager.GetTypeDataRef<TValue, TOptions>(this, checkIsInSequence).EndValue;
+        }
+
+        public ref TOptions GetOptions<TValue, TOptions>(bool checkIsInSequence = true)
+            where TValue : unmanaged
+            where TOptions : unmanaged, IMotionOptions
+        {
+            return ref MotionManager.GetTypeDataRef<TValue, TOptions>(this, checkIsInSequence).Options;
+        }
+
         public override readonly string ToString()
         {
             return $"MotionHandle`{StorageId} ({Index}:{Version})";
