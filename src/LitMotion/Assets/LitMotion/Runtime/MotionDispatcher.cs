@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using LitMotion.Collections;
+using LitMotion.LitMotion.Runtime.Internal;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -51,6 +52,7 @@ namespace LitMotion
                 {
                     storage = new MotionStorage<TValue, TOptions, TAdapter>(MotionManager.MotionTypeCount);
                     MotionManager.Register(storage);
+                    EnterThePlayModeHelper.Register(storage);
                 }
                 return storage;
             }
@@ -100,6 +102,7 @@ namespace LitMotion
                         runner = new UpdateRunner<TValue, TOptions, TAdapter>(storage, Time.timeAsDouble, Time.unscaledTimeAsDouble, Time.realtimeSinceStartupAsDouble);
                     }
                     GetRunnerList(playerLoopTiming).Add(runner);
+                    EnterThePlayModeHelper.Register(runner);
                     return (runner, true);
                 }
                 return (runner, false);
@@ -251,6 +254,7 @@ namespace LitMotion
                 {
                     storage = new MotionStorage<TValue, TOptions, TAdapter>(MotionManager.MotionTypeCount);
                     MotionManager.Register(storage);
+                    EnterThePlayModeHelper.Register(storage);
                 }
                 return storage;
             }
