@@ -169,48 +169,37 @@ namespace LitMotion
         }
 
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void RemoveAt(int denseIndex)
-        {
-            tail--;
-
-            // swap elements
-            unmanagedDataArray[denseIndex] = unmanagedDataArray[tail];
-            unmanagedDataArray[tail] = default;
-            managedDataArray[denseIndex] = managedDataArray[tail];
-            managedDataArray[tail] = default;
-
-            // swap sparse index
-            var prevSparseIndex = sparseIndexLookup[denseIndex];
-            var currentSparseIndex = sparseIndexLookup[denseIndex] = sparseIndexLookup[tail];
-            sparseIndexLookup[tail] = default;
-
-            // update slot
-            if (currentSparseIndex.Version != 0)
-            {
-                ref var slot = ref sparseSetCore.GetSlotRefUnchecked(currentSparseIndex.Index);
-                slot.DenseIndex = denseIndex;
-            }
-
-            // free slot
-            if (prevSparseIndex.Version != 0)
-            {
-                sparseSetCore.Free(prevSparseIndex);
-            }
-        }
-
         public void RemoveAll(NativeList<int> denseIndexList)
         {
-            var list = new NativeArray<SparseIndex>(denseIndexList.Length, Allocator.Temp, NativeArrayOptions.UninitializedMemory);
-            for (int i = 0; i < list.Length; i++)
+            if (denseIndexList.Length == 0) return;
+
+            // Mark removals before moving data; the job's indices may be unordered.
+            var newTail = tail;
+            for (int i = 0; i < denseIndexList.Length; i++)
             {
-                list[i] = sparseIndexLookup[denseIndexList[i]];
+                var denseIndex = denseIndexList[i];
+                sparseSetCore.Free(sparseIndexLookup[denseIndex]);
+                sparseIndexLookup[denseIndex] = default;
+                newTail = Math.Min(newTail, denseIndex);
             }
 
-            for (int i = 0; i < list.Length; i++)
+            // Preserve binding order, including motions appended by completion callbacks.
+            for (int i = newTail + 1; i < tail; i++)
             {
-                RemoveAt(sparseSetCore.GetSlotRefUnchecked(list[i].Index).DenseIndex);
+                var sparseIndex = sparseIndexLookup[i];
+                if (sparseIndex.Version == 0) continue;
+
+                unmanagedDataArray[newTail] = unmanagedDataArray[i];
+                managedDataArray[newTail] = managedDataArray[i];
+                sparseIndexLookup[newTail] = sparseIndex;
+                sparseSetCore.GetSlotRefUnchecked(sparseIndex.Index).DenseIndex = newTail;
+                newTail++;
             }
+
+            unmanagedDataArray.AsSpan(newTail, tail - newTail).Clear();
+            managedDataArray.AsSpan(newTail, tail - newTail).Clear();
+            sparseIndexLookup.AsSpan(newTail, tail - newTail).Clear();
+            tail = newTail;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
