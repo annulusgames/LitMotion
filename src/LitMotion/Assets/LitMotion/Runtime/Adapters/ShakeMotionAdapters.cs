@@ -29,7 +29,9 @@ namespace LitMotion.Adapters
         public float Evaluate(ref float startValue, ref float endValue, ref ShakeOptions options, in MotionEvaluationContext context)
         {
             VibrationHelper.EvaluateStrength(endValue, options.Frequency, options.DampingRatio, context.Progress, out var s);
-            var multipliar = ShakeNoise.PerlinNoise(options.RandomSeed, 0, context.Progress, options.Frequency);
+            var multipliar = options.ShakeMode == ShakeMode.Random
+                ? RandomHelper.NextFloat(options.RandomSeed, context.Time, -1f, 1f)
+                : ShakeNoise.PerlinNoise(options.RandomSeed, 0, context.Progress, options.Frequency);
             return startValue + s * multipliar;
         }
     }
@@ -39,7 +41,9 @@ namespace LitMotion.Adapters
         public Vector2 Evaluate(ref Vector2 startValue, ref Vector2 endValue, ref ShakeOptions options, in MotionEvaluationContext context)
         {
             VibrationHelper.EvaluateStrength(endValue, options.Frequency, options.DampingRatio, context.Progress, out var s);
-            var multipliar = new float2(
+            var multipliar = options.ShakeMode == ShakeMode.Random
+                ? RandomHelper.NextFloat2(options.RandomSeed, context.Time, new float2(-1f), new float2(1f))
+                : new float2(
                 ShakeNoise.PerlinNoise(options.RandomSeed, 0, context.Progress, options.Frequency),
                 ShakeNoise.PerlinNoise(options.RandomSeed, 1, context.Progress, options.Frequency));
             return startValue + new Vector2(s.x * multipliar.x, s.y * multipliar.y);
@@ -51,7 +55,9 @@ namespace LitMotion.Adapters
         public Vector3 Evaluate(ref Vector3 startValue, ref Vector3 endValue, ref ShakeOptions options, in MotionEvaluationContext context)
         {
             VibrationHelper.EvaluateStrength(endValue, options.Frequency, options.DampingRatio, context.Progress, out var s);
-            var multipliar = new float3(
+            var multipliar = options.ShakeMode == ShakeMode.Random
+                ? RandomHelper.NextFloat3(options.RandomSeed, context.Time, new float3(-1f), new float3(1f))
+                : new float3(
                 ShakeNoise.PerlinNoise(options.RandomSeed, 0, context.Progress, options.Frequency),
                 ShakeNoise.PerlinNoise(options.RandomSeed, 1, context.Progress, options.Frequency),
                 ShakeNoise.PerlinNoise(options.RandomSeed, 2, context.Progress, options.Frequency));
