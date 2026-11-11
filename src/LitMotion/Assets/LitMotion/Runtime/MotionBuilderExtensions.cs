@@ -79,6 +79,19 @@ namespace LitMotion
         }
 
         /// <summary>
+        /// Specify the noise used for shake motion.
+        /// </summary>
+        public static MotionBuilder<TValue, ShakeOptions, TAdapter> WithShakeMode<TValue, TAdapter>(this MotionBuilder<TValue, ShakeOptions, TAdapter> builder, ShakeMode shakeMode)
+            where TValue : unmanaged
+            where TAdapter : unmanaged, IMotionAdapter<TValue, ShakeOptions>
+        {
+            var options = builder.buffer.Options;
+            options.ShakeMode = shakeMode;
+            builder.buffer.Options = options;
+            return builder;
+        }
+
+        /// <summary>
         /// Specify the frequency of vibration.
         /// </summary>
         /// <typeparam name="TValue">The type of value to animate</typeparam>

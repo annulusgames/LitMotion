@@ -8,6 +8,7 @@ namespace LitMotion
     [Serializable]
     public struct ShakeOptions : IEquatable<ShakeOptions>, IMotionOptions
     {
+        public ShakeMode ShakeMode;
         public int Frequency;
         public float DampingRatio;
         public uint RandomSeed;
@@ -18,6 +19,7 @@ namespace LitMotion
             {
                 return new ShakeOptions()
                 {
+                    ShakeMode = ShakeMode.PerlinNoise,
                     Frequency = 10,
                     DampingRatio = 1f
                 };
@@ -26,7 +28,8 @@ namespace LitMotion
 
         public readonly bool Equals(ShakeOptions other)
         {
-            return other.Frequency == Frequency &&
+            return other.ShakeMode == ShakeMode &&
+                other.Frequency == Frequency &&
                 other.DampingRatio == DampingRatio &&
                 other.RandomSeed == RandomSeed;
         }
@@ -39,7 +42,7 @@ namespace LitMotion
 
         public override readonly int GetHashCode()
         {
-            return HashCode.Combine(Frequency, DampingRatio, RandomSeed);
+            return HashCode.Combine(ShakeMode, Frequency, DampingRatio, RandomSeed);
         }
     }
 }
