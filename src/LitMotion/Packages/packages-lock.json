@@ -228,7 +228,7 @@
       "dependencies": {
         "org.nuget.system.threading.tasks.extensions": "4.5.4"
       },
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.microsoft.bcl.timeprovider": {
       "version": "8.0.1",
@@ -237,7 +237,7 @@
       "dependencies": {
         "org.nuget.microsoft.bcl.asyncinterfaces": "8.0.0"
       },
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.r3": {
       "version": "1.1.10",
@@ -251,21 +251,21 @@
         "org.nuget.system.runtime.compilerservices.unsafe": "6.0.0",
         "org.nuget.system.threading.channels": "8.0.0"
       },
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.system.buffers": {
       "version": "4.5.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.system.componentmodel.annotations": {
       "version": "5.0.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {},
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.system.memory": {
       "version": "4.5.5",
@@ -276,21 +276,21 @@
         "org.nuget.system.numerics.vectors": "4.4.0",
         "org.nuget.system.runtime.compilerservices.unsafe": "4.5.3"
       },
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.system.numerics.vectors": {
       "version": "4.4.0",
       "depth": 2,
       "source": "registry",
       "dependencies": {},
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.system.runtime.compilerservices.unsafe": {
       "version": "6.0.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.system.threading.channels": {
       "version": "8.0.0",
@@ -299,7 +299,7 @@
       "dependencies": {
         "org.nuget.system.threading.tasks.extensions": "4.5.4"
       },
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "org.nuget.system.threading.tasks.extensions": {
       "version": "4.5.4",
@@ -308,7 +308,7 @@
       "dependencies": {
         "org.nuget.system.runtime.compilerservices.unsafe": "4.5.3"
       },
-      "url": "https://unitynuget-registry.azurewebsites.net"
+      "url": "https://unitynuget-registry.openupm.com"
     },
     "com.unity.modules.accessibility": {
       "version": "1.0.0",
