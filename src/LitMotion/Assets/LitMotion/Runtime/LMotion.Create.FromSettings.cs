@@ -95,6 +95,7 @@ namespace LitMotion
             buffer.Options = settings.Options;
             buffer.Ease = settings.Ease;
             buffer.AnimationCurve = settings.CustomEaseCurve;
+            buffer.CustomEaseFunction = settings.CustomEaseFunction;
             buffer.Delay = settings.Delay;
             buffer.DelayType = settings.DelayType;
             buffer.Loops = settings.Loops;
