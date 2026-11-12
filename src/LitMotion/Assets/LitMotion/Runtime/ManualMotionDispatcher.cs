@@ -92,7 +92,7 @@ namespace LitMotion
         {
             foreach (var kv in runners)
             {
-                kv.Value.Reset();
+                kv.Value.Reset(0, 0, 0);
             }
 
             time = 0;

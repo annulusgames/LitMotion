@@ -181,10 +181,14 @@ namespace LitMotion
         {
             foreach (var playerLoopTiming in playerLoopTimings)
             {
+                // Sync with the current time so the next Update does not see the whole elapsed time as one delta.
+                var isFixed = playerLoopTiming == PlayerLoopTiming.FixedUpdate;
+                var time = isFixed ? Time.fixedTimeAsDouble : Time.timeAsDouble;
+                var unscaledTime = isFixed ? Time.fixedUnscaledTimeAsDouble : Time.unscaledTimeAsDouble;
                 var span = GetRunnerList(playerLoopTiming).AsSpan();
                 for (int i = 0; i < span.Length; i++)
                 {
-                    span[i].Reset();
+                    span[i].Reset(time, unscaledTime, Time.realtimeSinceStartupAsDouble);
                 }
             }
         }

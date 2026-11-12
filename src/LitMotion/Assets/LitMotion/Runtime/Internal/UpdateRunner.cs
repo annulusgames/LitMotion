@@ -9,7 +9,7 @@ namespace LitMotion
     {
         IMotionStorage Storage { get; }
         public void Update(double time, double unscaledTime, double realtime);
-        public void Reset();
+        public void Reset(double time, double unscaledTime, double realtime);
     }
 
     internal sealed class UpdateRunner<TValue, TOptions, TAdapter> : IUpdateRunner
@@ -103,11 +103,11 @@ namespace LitMotion
             storage.RemoveAll(completedIndexList);
         }
 
-        public void Reset()
+        public void Reset(double time, double unscaledTime, double realtime)
         {
-            prevTime = 0;
-            prevUnscaledTime = 0;
-            prevRealtime = 0;
+            prevTime = time;
+            prevUnscaledTime = unscaledTime;
+            prevRealtime = realtime;
             storage.Reset();
         }
     }
