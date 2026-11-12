@@ -1,6 +1,14 @@
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
+// Unity 7 also diagnoses directives in inactive branches. Suppress only this
+// legacy guard so older Unity keeps its original development-build behavior.
+#pragma warning disable UAC0009
+#if UNITY_7000_0_OR_NEWER
+#if UNITY_ENABLE_CHECKS || UNITY_EDITOR
 #define LITMOTION_DEBUG
 #endif
+#elif DEVELOPMENT_BUILD || UNITY_EDITOR
+#define LITMOTION_DEBUG
+#endif
+#pragma warning restore UAC0009
 
 using System;
 using System.Runtime.CompilerServices;
