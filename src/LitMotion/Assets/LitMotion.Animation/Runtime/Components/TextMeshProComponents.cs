@@ -82,6 +82,17 @@ namespace LitMotion.Animation.Components
             target.color = c;
         }
     }
+    [Serializable]
+    [LitMotionAnimationComponentMenu("UI/TextMesh Pro/Color (For Sprite)")]
+    public sealed class TMPTextColorCanvasRendererAnimation : ColorPropertyAnimationComponent<TextMeshProUGUI>
+    {
+        protected override Color GetValue(TextMeshProUGUI target) => target.canvasRenderer.GetColor();
+        protected override void SetValue(TextMeshProUGUI target, in Color value)
+        {
+            target.havePropertiesChanged = true;
+            target.canvasRenderer.SetColor(value);
+        }
+    }
 }
 
 #endif
