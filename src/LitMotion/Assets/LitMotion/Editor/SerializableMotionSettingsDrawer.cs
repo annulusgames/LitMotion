@@ -47,6 +47,15 @@ namespace LitMotion.Editor
                     group.Add(PropertyFieldHelper.CreateFixedStringField(property.FindPropertyRelative("startValue"), FixedString4096Bytes.UTF8MaxLengthInBytes));
                     group.Add(PropertyFieldHelper.CreateFixedStringField(property.FindPropertyRelative("endValue"), FixedString4096Bytes.UTF8MaxLengthInBytes));
                 }
+                else if (valueType == typeof(UnityEngine.Color))
+                {
+                    var start_value = new ColorField("Start Value") { hdr = true, showAlpha = true };
+                    start_value.BindProperty(property.FindPropertyRelative("startValue"));
+                    var end_value = new ColorField("End Value") { hdr = true, showAlpha = true };
+                    end_value.BindProperty(property.FindPropertyRelative("endValue"));
+                    group.Add(start_value);
+                    group.Add(end_value);
+                }
                 else
                 {
                     AddPropertyField(group, property, "startValue");
