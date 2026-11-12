@@ -188,6 +188,10 @@ namespace LitMotion.Editor
                         {
                             GenericField("Custom Ease Curve", parameters.AnimationCurve);
                         }
+                        else if (parameters.Ease is Ease.CustomFunction)
+                        {
+                            GenericField("Custom Ease Function", parameters.CustomEaseFunction.IsCreated ? $"0x{parameters.CustomEaseFunction.Value.ToInt64():X}" : "None");
+                        }
 
                         EditorGUILayout.Space(4);
                         GenericField("Cancel On Error", managedDataRef.CancelOnError);

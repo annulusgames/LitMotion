@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using LitMotion.Collections;
+using Unity.Burst;
 using Unity.Burst.CompilerServices;
 using Unity.Mathematics;
 
@@ -36,6 +37,7 @@ namespace LitMotion
 #else
             public UnsafeAnimationCurve AnimationCurve;
 #endif
+            public FunctionPointer<CustomEaseDelegate> CustomEaseFunction;
             public MotionTimeKind TimeKind;
             public float Delay;
             public int Loops;
@@ -202,8 +204,24 @@ namespace LitMotion
             return Parameters.Ease switch
             {
                 Ease.CustomAnimationCurve => Parameters.AnimationCurve.Evaluate(value),
+                Ease.CustomFunction => EvaluateCustomFunction(value),
                 _ => EaseUtility.Evaluate(value, Parameters.Ease)
             };
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        readonly float EvaluateCustomFunction(float value)
+        {
+            if (CustomEaseHelper.IsBurst())
+            {
+                return Parameters.CustomEaseFunction.Invoke(value);
+            }
+            else
+            {
+                var result = 0f;
+                CustomEaseHelper.EvaluateManaged(Parameters.CustomEaseFunction.Value, value, ref result);
+                return result;
+            }
         }
     }
 

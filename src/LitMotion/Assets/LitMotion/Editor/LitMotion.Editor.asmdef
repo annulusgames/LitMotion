@@ -3,7 +3,8 @@
     "rootNamespace": "LitMotion.Editor",
     "references": [
         "GUID:3b570a5146f9d4f0fa107ed4559471a3",
-        "GUID:e0cd26848372d4e5c891c569017e11f1"
+        "GUID:e0cd26848372d4e5c891c569017e11f1",
+        "GUID:2665a8d13d1b3f18800f46e256720795"
     ],
     "includePlatforms": [
         "Editor"
