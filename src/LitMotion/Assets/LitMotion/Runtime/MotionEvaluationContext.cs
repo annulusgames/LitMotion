@@ -14,5 +14,10 @@ namespace LitMotion
         /// Current motion time
         /// </summary>
         public double Time;
+
+        /// <summary>
+        /// Delta time for this frame
+        /// </summary>
+        public double DeltaTime;
     }
 }
