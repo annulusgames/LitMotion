@@ -569,8 +569,12 @@ namespace LitMotion.Extensions
         }
 
         /// <summary>
-        /// Create motion data and bind it to the character color.
+        /// Create motion data and bind it to the character.
         /// </summary>
+        /// <remarks>
+        /// Character values are applied on top of the mesh TextMeshPro generates and are kept after the motion ends, including when the mesh is rebuilt.
+        /// Call <see cref="ResetTMPChars(TMP_Text)"/> to return the characters to how TextMeshPro draws them.
+        /// </remarks>
         /// <typeparam name="TValue">The type of value to animate</typeparam>
         /// <typeparam name="TOptions">The type of special parameters given to the motion entity</typeparam>
         /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
@@ -588,7 +592,7 @@ namespace LitMotion.Extensions
 
             var animator = TextMeshProMotionAnimator.Get(text);
             animator.EnsureCapacity(charIndex + 1);
-            var handle = builder.WithOnComplete(animator.completeAction).Bind(animator, Box.Create(charIndex), action, static (x, animator, charIndex, action) =>
+            var handle = builder.WithOnComplete(animator.motionEndAction).WithOnCancel(animator.motionEndAction).Bind(animator, Box.Create(charIndex), action, static (x, animator, charIndex, action) =>
             {
                 action(x, charIndex.Value, ref animator.charInfoArray[charIndex.Value]);
                 animator.SetDirty();
@@ -598,7 +602,20 @@ namespace LitMotion.Extensions
         }
 
         /// <summary>
-        /// Create motion data and bind it to the character color.
+        /// Reset the values that character motions have applied to TMP_Text, so the characters are drawn as TextMeshPro generates them.
+        /// </summary>
+        /// <remarks>
+        /// Motions that are still playing apply their values again on their next update.
+        /// </remarks>
+        /// <param name="text">Target TMP_Text</param>
+        public static void ResetTMPChars(this TMP_Text text)
+        {
+            Error.IsNull(text);
+            TextMeshProMotionAnimator.Reset(text);
+        }
+
+        /// <summary>
+        /// Create motion data and bind it to the character color tint, which is multiplied with the colors TextMeshPro generates for the character.
         /// </summary>
         /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
         /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
@@ -617,7 +634,7 @@ namespace LitMotion.Extensions
         }
 
         /// <summary>
-        /// Create motion data and bind it to the character color.r.
+        /// Create motion data and bind it to the character color tint.r.
         /// </summary>
         /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
         /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
@@ -636,7 +653,7 @@ namespace LitMotion.Extensions
         }
 
         /// <summary>
-        /// Create motion data and bind it to the character color.g.
+        /// Create motion data and bind it to the character color tint.g.
         /// </summary>
         /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
         /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
@@ -655,7 +672,7 @@ namespace LitMotion.Extensions
         }
 
         /// <summary>
-        /// Create motion data and bind it to the character color.b.
+        /// Create motion data and bind it to the character color tint.b.
         /// </summary>
         /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
         /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>
@@ -674,7 +691,7 @@ namespace LitMotion.Extensions
         }
 
         /// <summary>
-        /// Create motion data and bind it to the character color.a.
+        /// Create motion data and bind it to the character color tint.a.
         /// </summary>
         /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
         /// <typeparam name="TAdapter">The type of adapter that support value animation</typeparam>

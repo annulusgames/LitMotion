@@ -28,6 +28,16 @@
             "define": "LITMOTION_SUPPORT_TMP"
         },
         {
+            "name": "com.unity.textmeshpro",
+            "expression": "3.2.0-pre.1",
+            "define": "LITMOTION_TMP_LINEAR_VERTEX_COLORS"
+        },
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "LITMOTION_TMP_LINEAR_VERTEX_COLORS"
+        },
+        {
             "name": "com.unity.visualeffectgraph",
             "expression": "",
             "define": "LITMOTION_SUPPORT_VFX_GRAPH"
