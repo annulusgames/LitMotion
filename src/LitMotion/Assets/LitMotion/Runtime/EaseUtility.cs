@@ -97,18 +97,18 @@ namespace LitMotion
         public static float InOutQuint(float x) => x < 0.5f ? 16 * x * x * x * x * x : 1 - pow(-2 * x + 2, 5) / 2;
 
         [BurstCompile]
-        public static float InExpo(float x) => x == 0 ? 0 : pow(2, 10 * x - 10);
+        public static float InExpo(float x) => x == 0 ? 0 : exp2(10 * x - 10);
 
         [BurstCompile]
-        public static float OutExpo(float x) => x == 1 ? 1 : 1 - pow(2, -10 * x);
+        public static float OutExpo(float x) => x == 1 ? 1 : 1 - exp2(-10 * x);
 
         [BurstCompile]
         public static float InOutExpo(float x)
         {
             return x == 0 ? 0 :
                 x == 1 ? 1 :
-                x < 0.5f ? pow(2, 20 * x - 10) / 2 :
-                (2 - pow(2, -20 * x + 10)) / 2;
+                x < 0.5f ? exp2(20 * x - 10) / 2 :
+                (2 - exp2(-20 * x + 10)) / 2;
         }
 
         [BurstCompile]
@@ -159,7 +159,7 @@ namespace LitMotion
 
             return x == 0 ? 0 :
                 x == 1 ? 1 :
-                -pow(2, 10 * x - 10) * sin((x * 10 - 10.75f) * c4);
+                -exp2(10 * x - 10) * sin((x * 10 - 10.75f) * c4);
         }
 
         [BurstCompile]
@@ -169,7 +169,7 @@ namespace LitMotion
 
             return x == 0 ? 0 :
                 x == 1 ? 1 :
-                pow(2, -10 * x) * sin((x * 10 - 0.75f) * c4) + 1;
+                exp2(-10 * x) * sin((x * 10 - 0.75f) * c4) + 1;
         }
 
         [BurstCompile]
@@ -180,8 +180,8 @@ namespace LitMotion
             return x == 0 ? 0 :
                 x == 1 ? 1 :
                 x < 0.5f ?
-                -(pow(2, 20 * x - 10) * sin((20 * x - 11.125f) * c5)) / 2 :
-                pow(2, -20 * x + 10) * sin((20 * x - 11.125f) * c5) / 2 + 1;
+                -(exp2(20 * x - 10) * sin((20 * x - 11.125f) * c5)) / 2 :
+                exp2(-20 * x + 10) * sin((20 * x - 11.125f) * c5) / 2 + 1;
         }
 
         [BurstCompile]
