@@ -4,6 +4,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
+using Unity.Burst;
 using UnityEngine;
 
 namespace LitMotion
@@ -42,6 +43,7 @@ namespace LitMotion
             buffer.Duration = default;
             buffer.Ease = default;
             buffer.AnimationCurve = default;
+            buffer.CustomEaseFunction = default;
             buffer.TimeKind = default;
             buffer.Delay = default;
             buffer.Loops = 1;
@@ -98,6 +100,7 @@ namespace LitMotion
         public Action OnCompleteAction;
         public Action OnCancelAction;
         public AnimationCurve AnimationCurve;
+        public FunctionPointer<CustomEaseDelegate> CustomEaseFunction;
         public IMotionScheduler Scheduler;
 
 #if LITMOTION_DEBUG
@@ -136,6 +139,7 @@ namespace LitMotion
             CheckEaseType(ease);
             CheckBuffer();
             buffer.Ease = ease;
+            buffer.CustomEaseFunction = default;
             return this;
         }
 
@@ -149,7 +153,28 @@ namespace LitMotion
         {
             CheckBuffer();
             buffer.AnimationCurve = animationCurve;
+            buffer.CustomEaseFunction = default;
             buffer.Ease = Ease.CustomAnimationCurve;
+            return this;
+        }
+
+        /// <summary>
+        /// Specify a custom easing function compiled with Burst.
+        /// </summary>
+        /// <remarks>
+        /// The function is evaluated inside the Burst compiled update job, so it must be a pure function of the progress value.
+        /// Create the function pointer with BurstCompiler.CompileFunctionPointer&lt;CustomEaseDelegate&gt;.
+        /// </remarks>
+        /// <param name="customEase">Burst compiled function pointer</param>
+        /// <returns>This builder to allow chaining multiple method calls.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly MotionBuilder<TValue, TOptions, TAdapter> WithEase(FunctionPointer<CustomEaseDelegate> customEase)
+        {
+            CheckBuffer();
+            if (!customEase.IsCreated) throw new ArgumentException("Custom ease function pointer is not created. Compile it with BurstCompiler.CompileFunctionPointer<T>() before use.", nameof(customEase));
+            buffer.AnimationCurve = null;
+            buffer.CustomEaseFunction = customEase;
+            buffer.Ease = Ease.CustomFunction;
             return this;
         }
 
@@ -388,6 +413,7 @@ namespace LitMotion
                 Options = buffer.Options,
                 Ease = buffer.Ease,
                 CustomEaseCurve = buffer.AnimationCurve,
+                CustomEaseFunction = buffer.CustomEaseFunction,
                 Delay = buffer.Delay,
                 DelayType = buffer.DelayType,
                 Loops = buffer.Loops,
@@ -504,7 +530,7 @@ namespace LitMotion
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         readonly void CheckEaseType(Ease ease)
         {
-            if (ease is Ease.CustomAnimationCurve) throw new ArgumentException($"Ease.{ease} cannot be specified directly.");
+            if (ease is Ease.CustomAnimationCurve or Ease.CustomFunction) throw new ArgumentException($"Ease.{ease} cannot be specified directly.");
         }
     }
 }

@@ -1,3 +1,4 @@
+using Unity.Burst;
 using UnityEngine;
 
 namespace LitMotion
@@ -45,6 +46,12 @@ namespace LitMotion
         {
             get => customEaseCurve;
             init => customEaseCurve = value;
+        }
+
+        public FunctionPointer<CustomEaseDelegate> CustomEaseFunction
+        {
+            get => customEaseFunction;
+            init => customEaseFunction = value;
         }
 
         public float Delay
@@ -101,6 +108,7 @@ namespace LitMotion
         [SerializeField] TOptions options;
         [SerializeField] Ease ease;
         [SerializeField] AnimationCurve customEaseCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+        FunctionPointer<CustomEaseDelegate> customEaseFunction;
         [SerializeField] float delay;
         [SerializeField] DelayType delayType;
         [SerializeField] int loops = 1;

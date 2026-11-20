@@ -20,6 +20,37 @@ Specifies the easing function to apply to the motion.
 
 You can also specify AnimtaionCurve for this. (`Ease.CustomAnimationCurve` is automatically set when using `WithEase(AnimationCurve)`. Do not specify this option with `WithEase(Ease)`.)
 
+In addition, you can use a Burst-compiled function pointer as a fully custom easing function. Define a static method with the `CustomEaseDelegate` signature, mark it with `[BurstCompile]` and `[MonoPInvokeCallback]`, and compile it with `BurstCompiler.CompileFunctionPointer`. (`Ease.CustomFunction` is automatically set when using `WithEase(FunctionPointer<CustomEaseDelegate>)`. Do not specify this option with `WithEase(Ease)`.)
+
+```cs
+using AOT;
+using Unity.Burst;
+using Unity.Mathematics;
+
+[BurstCompile]
+static class CustomEases
+{
+    [BurstCompile]
+    [MonoPInvokeCallback(typeof(CustomEaseDelegate))]
+    public static float OutQuint(float t) => 1f - math.pow(1f - t, 5f);
+}
+
+static readonly FunctionPointer<CustomEaseDelegate> outQuint =
+    BurstCompiler.CompileFunctionPointer<CustomEaseDelegate>(CustomEases.OutQuint);
+
+LMotion.Create(0f, 10f, 1f)
+    .WithEase(outQuint)
+    .Bind(x => value = x);
+```
+
+The custom function is evaluated inside the Burst-compiled update job, so it must be a pure function of `t`. Depending on `LoopType`, it may be called more than once per frame (`LoopType.Incremental` evaluates the function twice per frame). As with the built-in easings, the function should return `0` at `t = 0` and `1` at `t = 1`.
+
+Note the following restrictions:
+
+* Function pointers are invalidated by a domain reload. Compile them again after reloading (for example, from a static initializer or an initialization method).
+* Custom functions cannot be serialized, so they cannot be set from `SerializableMotionSettings` / the Inspector. They are only available from code.
+* When Burst is disabled (e.g. Burst compilation turned off in the Editor), the function is invoked through a cached managed delegate instead. This still works, but it is slower than the Burst-compiled path.
+
 #### WithDelay
 
 Delay the start of a motion by a specified number of seconds. You can adjust the behavior by specifying `DelayType` and `SkipValuesDuringDelay`.

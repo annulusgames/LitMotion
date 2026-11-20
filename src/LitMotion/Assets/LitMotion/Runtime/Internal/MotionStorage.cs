@@ -80,8 +80,14 @@ namespace LitMotion
 
         public unsafe MotionHandle Create(ref MotionBuilder<TValue, TOptions, TAdapter> builder)
         {
-            EnsureCapacity(tail + 1);
             var buffer = builder.buffer;
+
+            if (buffer.Ease is Ease.CustomFunction && !buffer.CustomEaseFunction.IsCreated)
+            {
+                throw new ArgumentException("Custom ease function pointer is not created. Compile it with BurstCompiler.CompileFunctionPointer<T>() before use.");
+            }
+
+            EnsureCapacity(tail + 1);
 
             ref var dataRef = ref unmanagedDataArray[tail];
             ref var managedDataRef = ref managedDataArray[tail];
@@ -99,6 +105,7 @@ namespace LitMotion
             parameters.Delay = buffer.Delay;
             parameters.DelayType = buffer.DelayType;
             parameters.Ease = buffer.Ease;
+            parameters.CustomEaseFunction = buffer.CustomEaseFunction;
             parameters.Loops = buffer.Loops;
             parameters.LoopType = buffer.LoopType;
             dataRef.StartValue = buffer.StartValue;
@@ -119,6 +126,11 @@ namespace LitMotion
                     parameters.AnimationCurve = new UnsafeAnimationCurve(buffer.AnimationCurve, allocator.Allocator.Handle);
 #endif
                 }
+            }
+
+            if (buffer.Ease == Ease.CustomFunction)
+            {
+                CustomEaseHelper.Register(parameters.CustomEaseFunction);
             }
 
             managedDataRef.CancelOnError = buffer.CancelOnError;
@@ -148,6 +160,7 @@ namespace LitMotion
                             Progress = parameters.Ease switch
                             {
                                 Ease.CustomAnimationCurve => buffer.AnimationCurve.Evaluate(0f),
+                                Ease.CustomFunction => CustomEaseHelper.EvaluateManaged(parameters.CustomEaseFunction.Value, 0f),
                                 _ => EaseUtility.Evaluate(0f, parameters.Ease)
                             },
                             Time = state.Time,

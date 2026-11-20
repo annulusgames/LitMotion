@@ -21,6 +21,37 @@ LMotion.Create(0f, 10f, 2f)
 
 これにはAnimtaionCurveを指定することも可能です。(`Ease.CustomAnimationCurve`は`WithEase(AnimationCurve)`を使用した際に自動で設定されます。このオプションを`WithEase(Ease)`で指定しないでください。)
 
+さらに、Burstでコンパイルした関数ポインタを完全に独自のイージング関数として使用できます。`CustomEaseDelegate`シグネチャの静的メソッドを定義し、`[BurstCompile]`と`[MonoPInvokeCallback]`を付与して`BurstCompiler.CompileFunctionPointer`でコンパイルしてください。(`Ease.CustomFunction`は`WithEase(FunctionPointer<CustomEaseDelegate>)`を使用した際に自動で設定されます。このオプションを`WithEase(Ease)`で指定しないでください。)
+
+```cs
+using AOT;
+using Unity.Burst;
+using Unity.Mathematics;
+
+[BurstCompile]
+static class CustomEases
+{
+    [BurstCompile]
+    [MonoPInvokeCallback(typeof(CustomEaseDelegate))]
+    public static float OutQuint(float t) => 1f - math.pow(1f - t, 5f);
+}
+
+static readonly FunctionPointer<CustomEaseDelegate> outQuint =
+    BurstCompiler.CompileFunctionPointer<CustomEaseDelegate>(CustomEases.OutQuint);
+
+LMotion.Create(0f, 10f, 1f)
+    .WithEase(outQuint)
+    .Bind(x => value = x);
+```
+
+独自関数はBurstコンパイルされた更新用ジョブの内部で評価されるため、`t`のみに依存する純粋関数である必要があります。`LoopType`によっては1フレームに複数回呼ばれます(`LoopType.Incremental`では1フレームに2回評価されます)。組み込みのイージングと同様に、`t = 0`で`0`、`t = 1`で`1`を返すようにしてください。
+
+以下の制約に注意してください。
+
+* 関数ポインタはドメインリロードで無効になります。リロード後に再コンパイルしてください(静的初期化子や初期化用メソッドなどで行います)。
+* 独自関数はシリアライズできないため、`SerializableMotionSettings`やInspectorからは設定できません。コードからのみ使用できます。
+* Burstが無効な場合(EditorでBurstのコンパイルをオフにした場合など)は、キャッシュされたマネージドデリゲート経由で呼び出されます。動作はしますが、Burstコンパイルされた経路より遅くなります。
+
 #### WithDelay
 
 モーションの開始を指定された秒数だけ遅延させます。`DelayType`や`SkipValuesDuringDelay`を指定することで挙動を調整できます。
