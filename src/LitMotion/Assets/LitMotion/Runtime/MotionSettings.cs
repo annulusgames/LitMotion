@@ -7,6 +7,7 @@ namespace LitMotion
     /// </summary>
     /// <typeparam name="TValue">The type of value to animate</typeparam>
     /// <typeparam name="TOptions">The type of special parameters given to the motion data</typeparam>
+    [System.Serializable]
     public record MotionSettings<TValue, TOptions>
         where TValue : unmanaged
         where TOptions : unmanaged, IMotionOptions
