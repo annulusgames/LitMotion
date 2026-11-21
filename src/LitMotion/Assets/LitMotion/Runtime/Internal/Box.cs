@@ -18,7 +18,7 @@ namespace LitMotion
         static readonly Box<int> Box9 = new(9);
 
         static readonly Box<bool> BoxTrue = new(true);
-        static readonly Box<bool> BoxFalse = new(true);
+        static readonly Box<bool> BoxFalse = new(false);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Box<T> Create<T>(T value)
