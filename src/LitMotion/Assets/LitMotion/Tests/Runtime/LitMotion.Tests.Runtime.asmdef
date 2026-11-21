@@ -9,7 +9,9 @@
         "LitMotion",
         "LitMotion.Extensions",
         "UniTask",
-        "UniRx"
+        "UniRx",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -38,6 +40,16 @@
             "name": "com.cysharp.r3",
             "expression": "",
             "define": "LITMOTION_TEST_R3"
+        },
+        {
+            "name": "com.unity.textmeshpro",
+            "expression": "",
+            "define": "LITMOTION_TEST_TMP"
+        },
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "LITMOTION_TEST_TMP"
         }
     ],
     "noEngineReferences": false
