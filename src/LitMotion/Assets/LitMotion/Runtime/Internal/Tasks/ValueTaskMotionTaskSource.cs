@@ -2,9 +2,15 @@ using System;
 using System.Threading;
 using System.Threading.Tasks.Sources;
 using LitMotion.Collections;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Managed object pool; safe to reuse between Play mode sessions.
+#endif
     internal sealed class ValueTaskMotionTaskSource : MotionTaskSourceBase, IValueTaskSource, ILinkedPoolNode<ValueTaskMotionTaskSource>
     {
         static LinkedPool<ValueTaskMotionTaskSource> pool;

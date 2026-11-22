@@ -13,9 +13,15 @@
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Managed object pool; safe to reuse between Play mode sessions.
+#endif
     internal unsafe sealed class MotionBuilderBuffer<TValue, TOptions>
         where TValue : unmanaged
         where TOptions : unmanaged, IMotionOptions

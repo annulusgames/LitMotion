@@ -2,9 +2,15 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Managed object pool registered with UniTask's TaskPool.
+#endif
     internal sealed class UniTaskMotionTaskSource : MotionTaskSourceBase, IUniTaskSource, ITaskPoolNode<UniTaskMotionTaskSource>
     {
         static UniTaskMotionTaskSource()

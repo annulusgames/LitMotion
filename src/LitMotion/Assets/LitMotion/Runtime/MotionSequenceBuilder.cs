@@ -3,9 +3,15 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using LitMotion.Adapters;
 using LitMotion.Collections;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Managed object pool; safe to reuse between Play mode sessions.
+#endif
     internal sealed class MotionSequenceBuilderSource : ILinkedPoolNode<MotionSequenceBuilderSource>
     {
         static LinkedPool<MotionSequenceBuilderSource> pool;

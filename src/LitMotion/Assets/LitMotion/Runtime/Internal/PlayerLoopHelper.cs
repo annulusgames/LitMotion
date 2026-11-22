@@ -3,6 +3,9 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using PlayerLoopType = UnityEngine.PlayerLoop;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -36,7 +39,10 @@ namespace LitMotion
         TimeUpdate = 7,
     }
 
-    internal static class PlayerLoopHelper
+#if UNITY_7000_0_OR_NEWER
+    [AutoStaticsCleanup] // Clears the event handlers and the initialized flag before entering Play mode.
+#endif
+    internal static partial class PlayerLoopHelper
     {
         public static event Action OnInitialization;
         public static event Action OnEarlyUpdate;
@@ -49,14 +55,22 @@ namespace LitMotion
 
         static bool initialized;
 
+#if UNITY_7000_0_OR_NEWER && UNITY_EDITOR
+        // Auto statics cleanup clears the events before each Play mode,
+        // so re-register them here instead of relying on assembly load.
+        [UnityEngine.OnEnteringPlayMode]
+#else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+#endif
         static void Init()
         {
+#if !UNITY_7000_0_OR_NEWER
 #if UNITY_EDITOR
             var domainReloadDisabled = EditorSettings.enterPlayModeOptionsEnabled && EditorSettings.enterPlayModeOptions.HasFlag(EnterPlayModeOptions.DisableDomainReload);
             if (!domainReloadDisabled && initialized) return;
 #else
             if (initialized) return;
+#endif
 #endif
 
             if (!initialized)

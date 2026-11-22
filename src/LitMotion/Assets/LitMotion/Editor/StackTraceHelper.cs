@@ -5,9 +5,15 @@ using System.IO;
 using System.Security;
 using System.Text;
 using UnityEngine;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion.Editor
 {
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Reusable scratch buffer; it is cleared before every use.
+#endif
     internal static class StackTraceHelper
     {
         static readonly StringBuilder sb = new();

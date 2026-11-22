@@ -1,11 +1,17 @@
 #if UNITY_2023_1_OR_NEWER
 using System.Threading;
 using UnityEngine;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
     // TODO: use object pool
 
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Stateless singletons; keep them allocated between Play mode sessions.
+#endif
     internal sealed class AwaitableMotionTaskSource : MotionTaskSourceBase
     {
         public static AwaitableMotionTaskSource CompletedSource

@@ -1,10 +1,16 @@
 using System;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
     /// <summary>
     /// Schedulers available in Runtime.
     /// </summary>
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Scheduler instances are immutable and DefaultScheduler is user configuration.
+#endif
     public static class MotionScheduler
     {
         static MotionScheduler()

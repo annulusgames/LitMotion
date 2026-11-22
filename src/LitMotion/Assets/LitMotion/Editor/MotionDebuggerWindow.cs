@@ -2,12 +2,18 @@ using System.Linq;
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion.Editor
 {
     /// <summary>
     /// Editor window that displays a list of motions being tracked.
     /// </summary>
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Editor window state, not Play mode state.
+#endif
     public class MotionDebuggerWindow : EditorWindow
     {
         static MotionDebuggerWindow instance;

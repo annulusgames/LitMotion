@@ -1,6 +1,9 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion.Collections
 {
@@ -13,6 +16,9 @@ namespace LitMotion.Collections
     {
         const int InitialCapacity = 8;
 
+#if UNITY_7000_0_OR_NEWER
+        [NoAutoStaticsCleanup] // Immutable empty value.
+#endif
         public static readonly FastListCore<T> Empty = default;
 
         T[] array;

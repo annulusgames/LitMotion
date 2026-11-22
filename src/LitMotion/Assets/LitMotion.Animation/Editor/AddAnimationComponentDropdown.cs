@@ -4,6 +4,9 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion.Animation.Editor
 {
@@ -19,6 +22,9 @@ namespace LitMotion.Animation.Editor
             public Type Type { get; }
         }
 
+#if UNITY_7000_0_OR_NEWER
+        [NoAutoStaticsCleanup] // Immutable TypeCache lookup table.
+#endif
         static readonly (Type Type, string MenuName)[] cache = TypeCache.GetTypesDerivedFrom<LitMotionAnimationComponent>()
             .Where(x => !x.IsAbstract)
             .Where(x => !x.IsSpecialName)
