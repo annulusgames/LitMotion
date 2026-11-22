@@ -1,0 +1,9 @@
+<Project>
+
+  <!-- R3 is consumed from NuGet instead of the R3.Unity UPM package in this project. -->
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);LITMOTION_SUPPORT_R3</DefineConstants>
+    <DefineConstants Condition="$(MSBuildProjectName.Contains('LitMotion.Tests'))">$(DefineConstants);LITMOTION_TEST_R3</DefineConstants>
+  </PropertyGroup>
+
+</Project>
