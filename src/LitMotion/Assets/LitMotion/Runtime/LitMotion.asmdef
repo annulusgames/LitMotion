@@ -33,11 +33,6 @@
             "define": "LITMOTION_SUPPORT_R3"
         },
         {
-            "name": "org.nuget.r3",
-            "expression": "",
-            "define": "LITMOTION_SUPPORT_R3"
-        },
-        {
             "name": "com.unity.collections",
             "expression": "2.0.0",
             "define": "LITMOTION_COLLECTIONS_2_0_OR_NEWER"
