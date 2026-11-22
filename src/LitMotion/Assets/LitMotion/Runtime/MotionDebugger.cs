@@ -1,15 +1,27 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
     /// <summary>
     /// Provides functionality for tracking active motions.
     /// </summary>
-    public static class MotionDebugger
+#if UNITY_7000_0_OR_NEWER
+    [AutoStaticsCleanup]
+#endif
+    public static partial class MotionDebugger
     {
+#if UNITY_7000_0_OR_NEWER
+        [NoAutoStaticsCleanup] // Editor preference; keep the user's debugger setting across Play mode.
+#endif
         public static bool Enabled = false;
+#if UNITY_7000_0_OR_NEWER
+        [NoAutoStaticsCleanup] // Editor preference; keep the user's debugger setting across Play mode.
+#endif
         public static bool EnableStackTrace = false;
 
         public static IReadOnlyList<TrackingState> Items => trackings;
@@ -41,7 +53,10 @@ namespace LitMotion
             trackings.Clear();
         }
 
-        public sealed class TrackingState
+#if UNITY_7000_0_OR_NEWER
+        [AutoStaticsCleanup]
+#endif
+        public sealed partial class TrackingState
         {
             static readonly Stack<TrackingState> pool = new(16);
 

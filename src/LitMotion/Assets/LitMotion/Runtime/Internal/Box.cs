@@ -1,8 +1,14 @@
 using System.Runtime.CompilerServices;
 using Unity.Collections.LowLevel.Unsafe;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Immutable boxed-value cache; it must survive Play mode transitions.
+#endif
     internal static class Box
     {
         static readonly Box<int> BoxMinus1 = new(-1);

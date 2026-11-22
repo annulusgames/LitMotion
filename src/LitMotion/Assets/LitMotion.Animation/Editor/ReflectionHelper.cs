@@ -4,9 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion.Animation.Editor
 {
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Immutable reflection caches.
+#endif
     internal static class ReflectionHelper
     {
         static readonly Dictionary<(Type, string, BindingFlags, bool), FieldInfo> cacheFieldInfo = new();

@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
@@ -24,11 +27,14 @@ namespace LitMotion
     /// <summary>
     /// Manually updatable MotionDispatcher
     /// </summary>
-    public sealed class ManualMotionDispatcher
+    public sealed partial class ManualMotionDispatcher
     {
         /// <summary>
         /// Default ManualMotionDispatcher
         /// </summary>
+#if UNITY_7000_0_OR_NEWER
+        [NoAutoStaticsCleanup] // Singleton; its per-play state is reset by the lifecycle callbacks below.
+#endif
         public static readonly ManualMotionDispatcher Default = new();
 
         /// <summary>
@@ -43,6 +49,22 @@ namespace LitMotion
         {
             scheduler = new(this);
         }
+
+#if UNITY_7000_0_OR_NEWER
+        [UnityEngine.OnEnteringPlayMode]
+        static void ResetOnEnteringPlayMode() => ResetDefault();
+
+        [UnityEngine.OnExitingPlayMode]
+        static void ResetOnExitingPlayMode() => ResetDefault();
+
+        static void ResetDefault()
+        {
+            // MotionManager is auto-cleaned with the other static state, so the runners
+            // held by the persistent singleton must be rebuilt for the new session.
+            Default.runners.Clear();
+            Default.time = 0;
+        }
+#endif
 
         /// <summary>
         /// ManualMotionDispatcher time. It increases every time Update is called.

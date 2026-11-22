@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.Collections;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -8,7 +11,10 @@ using UnityEditor;
 
 namespace LitMotion
 {
-    internal static class RewindableAllocatorFactory
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Owns native allocators, so it cleans up manually in OnExitingPlayMode.
+#endif
+    internal static partial class RewindableAllocatorFactory
     {
         const int InitialSize = 128 * 1024;
         static bool isInitialized;
@@ -29,7 +35,13 @@ namespace LitMotion
         {
             if (!isInitialized)
             {
-#if UNITY_EDITOR
+#if UNITY_7000_0_OR_NEWER
+                // The Lifecycle API preserves this static state across code reloads.
+                // Native allocators are released when exiting Play mode instead.
+#if !UNITY_EDITOR
+                UnityEngine.Application.quitting += Dispose;
+#endif
+#elif UNITY_EDITOR
                 AssemblyReloadEvents.beforeAssemblyReload += Dispose;
 #else
                 UnityEngine.Application.quitting += Dispose;
@@ -38,6 +50,9 @@ namespace LitMotion
             }
         }
 
+#if UNITY_7000_0_OR_NEWER
+        [UnityEngine.OnExitingPlayMode]
+#endif
         static void Dispose()
         {
             while (allocators.TryPop(out var allocatorHelper))

@@ -3,9 +3,15 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityEditor;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion.Editor
 {
+#if UNITY_7000_0_OR_NEWER
+    [NoAutoStaticsCleanup] // Immutable reflection caches.
+#endif
     internal static class SplitterGUILayout
     {
         static BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;

@@ -1,10 +1,16 @@
 using System;
 using System.Runtime.CompilerServices;
 using LitMotion.Collections;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 namespace LitMotion
 {
-    internal static class MotionManager
+#if UNITY_7000_0_OR_NEWER
+    [AutoStaticsCleanup]
+#endif
+    internal static partial class MotionManager
     {
         static FastListCore<IMotionStorage> list;
 

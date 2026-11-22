@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using TMPro;
+#if UNITY_7000_0_OR_NEWER
+using Unity.Scripting.LifecycleManagement;
+#endif
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -26,16 +29,27 @@ namespace LitMotion.Extensions
     /// <summary>
     /// Wrapper class for animating individual characters in TextMeshPro.
     /// </summary>
-    internal sealed class TextMeshProMotionAnimator
+#if UNITY_7000_0_OR_NEWER
+    [AutoStaticsCleanup]
+#endif
+    internal sealed partial class TextMeshProMotionAnimator
     {
+#if UNITY_7000_0_OR_NEWER && UNITY_EDITOR
+        // Auto statics cleanup clears the state before each Play mode,
+        // so re-register the update callback here instead of on assembly load.
+        [UnityEngine.OnEnteringPlayMode]
+#else
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+#endif
         static void Init()
         {
+#if !UNITY_7000_0_OR_NEWER
 #if UNITY_EDITOR
             var domainReloadDisabled = EditorSettings.enterPlayModeOptionsEnabled && EditorSettings.enterPlayModeOptions.HasFlag(EnterPlayModeOptions.DisableDomainReload);
             if (!domainReloadDisabled && initialized) return;
 #else
             if (initialized) return;
+#endif
 #endif
             PlayerLoopHelper.OnUpdate += UpdateAnimators;
             initialized = true;
