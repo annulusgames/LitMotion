@@ -45,8 +45,9 @@ namespace LitMotion
                     _ => default
                 };
 
-                var time = state.Time + deltaTime * state.PlaybackSpeed;
-                ptr->Update<TAdapter>(time, out var result);
+                deltaTime *= state.PlaybackSpeed;
+                var time = state.Time + deltaTime;
+                ptr->Update<TAdapter>(time, deltaTime, out var result);
                 Output[index] = result;
             }
             else if ((!state.IsPreserved && state.Status is MotionStatus.Completed) || state.Status is MotionStatus.Canceled)
