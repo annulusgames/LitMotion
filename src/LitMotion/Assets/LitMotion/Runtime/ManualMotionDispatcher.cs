@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Collections;
 #if UNITY_7000_0_OR_NEWER
 using Unity.Scripting.LifecycleManagement;
 #endif
@@ -101,9 +102,17 @@ namespace LitMotion
         {
             time += deltaTime;
 
-            foreach (var kv in runners)
+            NativeList<int> completedIndices = default;
+            try
             {
-                kv.Value.Update(time, time, time);
+                foreach (var kv in runners)
+                {
+                    kv.Value.Update(time, time, time, ref completedIndices);
+                }
+            }
+            finally
+            {
+                if (completedIndices.IsCreated) completedIndices.Dispose();
             }
         }
 

@@ -8,7 +8,7 @@ namespace LitMotion
     internal interface IUpdateRunner
     {
         IMotionStorage Storage { get; }
-        public void Update(double time, double unscaledTime, double realtime);
+        public void Update(double time, double unscaledTime, double realtime, ref NativeList<int> completedIndexList);
         public void Reset(double time, double unscaledTime, double realtime);
     }
 
@@ -36,7 +36,7 @@ namespace LitMotion
         public MotionStorage<TValue, TOptions, TAdapter> Storage => storage;
         IMotionStorage IUpdateRunner.Storage => storage;
 
-        public unsafe void Update(double time, double unscaledTime, double realtime)
+        public unsafe void Update(double time, double unscaledTime, double realtime, ref NativeList<int> completedIndexList)
         {
             var deltaTime = time - prevTime;
             var unscaledDeltaTime = unscaledTime - prevUnscaledTime;
@@ -48,8 +48,17 @@ namespace LitMotion
             var count = storage.Count;
             if (count == 0) return;
 
+            if (!completedIndexList.IsCreated)
+            {
+                completedIndexList = new NativeList<int>(count, Allocator.TempJob);
+            }
+            else
+            {
+                completedIndexList.Clear();
+                if (completedIndexList.Capacity < count) completedIndexList.Capacity = count;
+            }
+
             using var output = new NativeArray<TValue>(count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            using var completedIndexList = new NativeList<int>(count, Allocator.TempJob);
 
             fixed (MotionData<TValue, TOptions>* dataPtr = storage.GetDataSpan())
             {
