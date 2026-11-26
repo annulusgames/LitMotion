@@ -59,6 +59,7 @@ namespace LitMotion.Tests.Runtime
         {
             var value = 0f;
             var handle = LMotion.Create(1f, 2f, 0.5f)
+                .WithImmediateBind(false)
                 .WithDelay(0.5f, skipValuesDuringDelay: false)
                 .Bind(x => value = x);
             yield return new WaitForSeconds(0.1f);
@@ -67,6 +68,7 @@ namespace LitMotion.Tests.Runtime
             handle.Cancel();
             value = 0f;
             handle = LMotion.Create(1f, 2f, 0.5f)
+                .WithImmediateBind(false)
                 .WithDelay(0.5f, skipValuesDuringDelay: true)
                 .Bind(x => value = x);
             yield return new WaitForSeconds(0.1f);

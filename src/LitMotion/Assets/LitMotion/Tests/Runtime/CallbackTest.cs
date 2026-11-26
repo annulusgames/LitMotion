@@ -131,15 +131,18 @@ namespace LitMotion.Tests.Runtime
         [UnityTest]
         public IEnumerator Test_WithCancelOnError()
         {
-            LogAssert.ignoreFailingMessages = true;
+            LogAssert.Expect(LogType.Exception, "Exception: Test");
             var completed = false;
+            var canceled = false;
             LMotion.Create(0f, 10f, 0.5f)
+                .WithImmediateBind(false)
                 .WithCancelOnError()
+                .WithOnCancel(() => canceled = true)
                 .WithOnComplete(() => completed = true)
                 .Bind(x => throw new Exception("Test"));
             yield return new WaitForSeconds(0.7f);
+            Assert.IsTrue(canceled);
             Assert.IsFalse(completed);
-            LogAssert.ignoreFailingMessages = false;
         }
 
         [UnityTest]

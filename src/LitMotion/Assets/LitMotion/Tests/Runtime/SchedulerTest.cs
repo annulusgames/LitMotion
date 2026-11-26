@@ -78,6 +78,7 @@ namespace LitMotion.Tests.Runtime
         {
             yield return LMotion.Create(0f, 10f, Duration)
                 .WithScheduler(MotionScheduler.FixedUpdate)
+                .WithImmediateBind(false)
                 .Bind(x =>
                 {
                     Assert.IsTrue(Time.inFixedTimeStep);
