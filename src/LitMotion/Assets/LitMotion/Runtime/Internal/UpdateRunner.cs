@@ -36,16 +36,18 @@ namespace LitMotion
 
         public unsafe void Update(double time, double unscaledTime, double realtime)
         {
-            var count = storage.Count;
-            using var output = new NativeArray<TValue>(count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-            using var completedIndexList = new NativeList<int>(count, Allocator.TempJob);
-
             var deltaTime = time - prevTime;
             var unscaledDeltaTime = unscaledTime - prevUnscaledTime;
             var realDeltaTime = realtime - prevRealtime;
             prevTime = time;
             prevUnscaledTime = unscaledTime;
             prevRealtime = realtime;
+
+            var count = storage.Count;
+            if (count == 0) return;
+
+            using var output = new NativeArray<TValue>(count, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+            using var completedIndexList = new NativeList<int>(count, Allocator.TempJob);
 
             fixed (MotionData<TValue, TOptions>* dataPtr = storage.GetDataSpan())
             {
@@ -64,7 +66,7 @@ namespace LitMotion
                 // invoke delegates
                 var managedDataSpan = storage.GetManagedDataSpan();
                 var outputPtr = (TValue*)output.GetUnsafePtr();
-                for (int i = 0; i < managedDataSpan.Length; i++)
+                for (int i = 0; i < count; i++)
                 {
                     var currentDataPtr = dataPtr + i;
                     ref var state = ref currentDataPtr->Core.State;
@@ -100,7 +102,7 @@ namespace LitMotion
                 }
             }
 
-            storage.RemoveAll(completedIndexList);
+            if (completedIndexList.Length > 0) storage.RemoveAll(completedIndexList);
         }
 
         public void Reset(double time, double unscaledTime, double realtime)
