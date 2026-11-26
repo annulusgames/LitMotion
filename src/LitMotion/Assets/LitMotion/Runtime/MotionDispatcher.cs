@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using Unity.Collections;
 using UnityEngine;
 using LitMotion.Collections;
 #if UNITY_7000_0_OR_NEWER
@@ -245,13 +246,21 @@ namespace LitMotion
             if (!EditorApplication.isPlaying) return;
 #endif
             var span = GetRunnerList(playerLoopTiming).AsSpan();
-            if (playerLoopTiming == PlayerLoopTiming.FixedUpdate)
+            NativeList<int> completedIndices = default;
+            try
             {
-                for (int i = 0; i < span.Length; i++) span[i].Update(Time.fixedTimeAsDouble, Time.fixedUnscaledTimeAsDouble, Time.realtimeSinceStartupAsDouble);
+                if (playerLoopTiming == PlayerLoopTiming.FixedUpdate)
+                {
+                    for (int i = 0; i < span.Length; i++) span[i].Update(Time.fixedTimeAsDouble, Time.fixedUnscaledTimeAsDouble, Time.realtimeSinceStartupAsDouble, ref completedIndices);
+                }
+                else
+                {
+                    for (int i = 0; i < span.Length; i++) span[i].Update(Time.timeAsDouble, Time.unscaledTimeAsDouble, Time.realtimeSinceStartupAsDouble, ref completedIndices);
+                }
             }
-            else
+            finally
             {
-                for (int i = 0; i < span.Length; i++) span[i].Update(Time.timeAsDouble, Time.unscaledTimeAsDouble, Time.realtimeSinceStartupAsDouble);
+                if (completedIndices.IsCreated) completedIndices.Dispose();
             }
         }
     }
@@ -323,9 +332,17 @@ namespace LitMotion
         static void Update()
         {
             var span = updateRunners.AsSpan();
-            for (int i = 0; i < span.Length; i++)
+            NativeList<int> completedIndices = default;
+            try
             {
-                span[i].Update(EditorApplication.timeSinceStartup, EditorApplication.timeSinceStartup, Time.realtimeSinceStartupAsDouble);
+                for (int i = 0; i < span.Length; i++)
+                {
+                    span[i].Update(EditorApplication.timeSinceStartup, EditorApplication.timeSinceStartup, Time.realtimeSinceStartupAsDouble, ref completedIndices);
+                }
+            }
+            finally
+            {
+                if (completedIndices.IsCreated) completedIndices.Dispose();
             }
         }
     }

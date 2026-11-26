@@ -47,6 +47,31 @@ namespace LitMotion.Tests.Runtime
         }
 
         [Test]
+        public void Test_UpdateClearsCompletedIndicesBetweenStorages()
+        {
+            var dispatcher = new ManualMotionDispatcher();
+            var canceled = LMotion.Create(0f, 1f, 1f)
+                .WithScheduler(dispatcher.Scheduler)
+                .RunWithoutBinding();
+            canceled.Cancel();
+
+            var handles = new MotionHandle[17];
+            for (int i = 0; i < handles.Length; i++)
+            {
+                handles[i] = LMotion.Create(0d, 1d, 1f)
+                    .WithScheduler(dispatcher.Scheduler)
+                    .RunWithoutBinding();
+            }
+
+            dispatcher.Update(0.5);
+
+            foreach (var handle in handles)
+            {
+                Assert.That(handle.IsActive(), Is.True);
+            }
+        }
+
+        [Test]
         public void Test_Time()
         {
             var dispatcher = new ManualMotionDispatcher();
