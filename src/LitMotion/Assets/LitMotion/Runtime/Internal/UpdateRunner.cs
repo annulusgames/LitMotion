@@ -17,6 +17,8 @@ namespace LitMotion
         where TOptions : unmanaged, IMotionOptions
         where TAdapter : unmanaged, IMotionAdapter<TValue, TOptions>
     {
+        const int JobBatchSize = 16;
+
         public UpdateRunner(MotionStorage<TValue, TOptions, TAdapter> storage, double time, double unscaledTime, double realtime)
         {
             this.storage = storage;
@@ -61,7 +63,14 @@ namespace LitMotion
                     Output = output,
                     CompletedIndexList = completedIndexList.AsParallelWriter()
                 };
-                job.Schedule(count, 16).Complete();
+                if (count <= JobBatchSize)
+                {
+                    job.Run(count);
+                }
+                else
+                {
+                    job.Schedule(count, JobBatchSize).Complete();
+                }
 
                 // invoke delegates
                 var managedDataSpan = storage.GetManagedDataSpan();
