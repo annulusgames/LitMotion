@@ -25,6 +25,21 @@ namespace LitMotion.Tests.Runtime
         }
 
         [Test]
+        public void Test_FirstMotionAfterDispatcherHasAdvanced()
+        {
+            var Dispatcher = new ManualMotionDispatcher();
+            Dispatcher.Update(10.0);
+
+            float value = 0f;
+            LMotion.Create(0f, 10f, 1f)
+                .WithScheduler(Dispatcher.Scheduler)
+                .Bind(x => value = x);
+
+            Dispatcher.Update(0.5);
+            Assert.That(value, Is.EqualTo(5f).Using(FloatEqualityComparer.Instance));
+        }
+
+        [Test]
         public void Test_UpdateAfterStorageBecomesEmpty()
         {
             var dispatcher = new ManualMotionDispatcher();

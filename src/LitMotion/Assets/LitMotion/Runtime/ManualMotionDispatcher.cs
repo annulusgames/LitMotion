@@ -140,7 +140,7 @@ namespace LitMotion
                 var storage = new MotionStorage<TValue, TOptions, TAdapter>(MotionManager.MotionTypeCount);
                 MotionManager.Register(storage);
 
-                runner = new UpdateRunner<TValue, TOptions, TAdapter>(storage, 0, 0, 0);
+                runner = new UpdateRunner<TValue, TOptions, TAdapter>(storage, time, time, time);
                 runners.Add(key, runner);
             }
 
